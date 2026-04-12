@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - Hệ Thống Đặt Phòng Học</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; }
+        .sidebar { min-height: 100vh; background-color: #343a40; }
+        .sidebar a { color: #c2c7d0; text-decoration: none; padding: 12px 20px; display: block; border-radius: 5px; margin-bottom: 5px; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background-color: #0d6efd; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid p-0 d-flex h-100">
+    
+    <div class="sidebar p-3 shadow text-white" style="width: 260px;">
+        <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary">
+            <i class="fa-solid fa-user-shield fs-3 text-primary me-2"></i>
+            <span class="fs-5 fw-bold">Admin Portal</span>
+        </div>
+        
+        <div class="mb-3 text-secondary small fw-bold text-uppercase px-3">Quản lý hệ thống</div>
+        <nav>
+            <a href="#" class="active"><i class="fa-solid fa-door-open me-2"></i> Quản lý Phòng học</a>
+            <a href="#"><i class="fa-solid fa-users me-2"></i> Quản lý Người dùng</a>
+            <a href="#"><i class="fa-solid fa-calendar-check me-2"></i> Tất cả Lịch đặt</a>
+            <a href="#"><i class="fa-solid fa-chart-line me-2"></i> Thống kê</a>
+        </nav>
+
+        <div class="mt-auto pt-4 border-top border-secondary position-absolute bottom-0 w-100 pb-3" style="left: 0; padding-inline: 1rem;">
+            <button class="btn btn-outline-light btn-sm w-100"><i class="fa-solid fa-sign-out-alt me-2"></i>Đăng xuất</button>
+        </div>
+    </div>
+
+    <div class="flex-grow-1 p-4">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold mb-1">Quản lý Phòng học</h3>
+                <p class="text-muted mb-0">Thêm, sửa, xóa và quản lý trạng thái các phòng trong hệ thống.</p>
+            </div>
+            <button class="btn btn-primary fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#roomModal">
+                <i class="fa-solid fa-plus me-2"></i>Thêm Phòng Mới
+            </button>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th scope="col" class="ps-4">Tên Phòng</th>
+                                <th scope="col" class="text-center">Sức chứa</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col" class="text-center">Lịch đặt tương lai</th>
+                                <th scope="col" class="text-end pe-4">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">Phòng A101</td>
+                                <td class="text-center">40</td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success">Khả dụng</span></td>
+                                <td class="text-center"><span class="badge bg-primary rounded-pill">2 lịch</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-light btn-sm text-primary me-1" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-light btn-sm text-secondary" disabled title="Không thể xóa vì đang có lịch đặt trong tương lai">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">Phòng B202</td>
+                                <td class="text-center">120</td>
+                                <td><span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Bảo trì</span></td>
+                                <td class="text-center"><span class="badge bg-secondary rounded-pill">0</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-light btn-sm text-primary me-1" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-light btn-sm text-danger" title="Xóa phòng">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="ps-4 fw-bold text-dark">Phòng C305</td>
+                                <td class="text-center">30</td>
+                                <td><span class="badge bg-success bg-opacity-10 text-success border border-success">Khả dụng</span></td>
+                                <td class="text-center"><span class="badge bg-secondary rounded-pill">0</span></td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-light btn-sm text-primary me-1" title="Sửa"><i class="fa-solid fa-pen"></i></button>
+                                    <button class="btn btn-light btn-sm text-danger" title="Xóa phòng">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white py-3">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm justify-content-end mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">Trước</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Sau</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="roomModal" tabindex="-1" aria-labelledby="roomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="roomModalLabel">Thêm Phòng Học Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form>
+                    <div class="mb-3">
+                        <label for="roomName" class="form-label fw-semibold">Tên phòng</label>
+                        <input type="text" class="form-control" id="roomName" placeholder="Ví dụ: D401" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="roomCapacity" class="form-label fw-semibold">Sức chứa (Người)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fa-solid fa-users"></i></span>
+                            <input type="number" class="form-control" id="roomCapacity" min="5" max="200" placeholder="Từ 5 đến 200" required>
+                        </div>
+                        <div class="form-text text-danger small"><i class="fa-solid fa-circle-info me-1"></i>Sức chứa bắt buộc từ 5 đến 200.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="roomStatus" class="form-label fw-semibold">Trạng thái hiện tại</label>
+                        <select class="form-select" id="roomStatus">
+                            <option value="active" selected>Khả dụng (Sẵn sàng đặt)</option>
+                            <option value="maintenance">Đang bảo trì</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-primary fw-bold px-4">Lưu thông tin</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
