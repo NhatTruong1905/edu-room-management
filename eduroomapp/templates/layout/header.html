@@ -1,0 +1,23 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">
+            <i class="fa-solid fa-school me-2"></i>EduRoom Booking
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="d-flex align-items-center mt-2 mt-lg-0">
+            {% if current_user.is_authenticated %}
+            <span class="badge rounded-pill border border-light bg-primary me-3 py-2 px-3 fs-6 fw-normal">
+                                    Chào {{ current_user.username }}!
+                                </span>
+            <a href="/logout" class="btn btn-outline-light btn-sm"><i class="fa-solid fa-sign-out-alt me-1"></i>Đăng
+                xuất</a>
+            {% else %}
+            <a href="/login" class="btn btn-light btn-sm me-2 fw-bold text-primary">Đăng nhập</a>
+            <a href="/register" class="btn btn-outline-light btn-sm fw-bold">Đăng ký</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>

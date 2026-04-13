@@ -1,77 +1,65 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Ký - EduRoom Booking</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f4f6f9; }
-        .auth-card { max-width: 450px; width: 100%; border-radius: 12px; }
-    </style>
-</head>
-<body class="d-flex align-items-center justify-content-center min-vh-100 py-4">
+{% extends 'layout/base.html' %}
 
-    <div class="card auth-card shadow-lg border-0 p-4 p-md-5 bg-white">
+{% block title %}Đăng Ký - EduRoom Booking{% endblock %}
+
+{% block content %}
+<div class="container d-flex justify-content-center align-items-center py-5">
+    <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5" style="max-width: 550px; width: 100%;">
+
         <div class="text-center mb-4">
-            <div class="bg-success text-white d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px;">
-                <i class="fa-solid fa-user-plus fs-3"></i>
+            <div class="bg-success bg-opacity-10 text-success d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                 style="width: 70px; height: 70px;">
+                <i class="fa-solid fa-user-plus fs-2"></i>
             </div>
-            <h4 class="fw-bold text-dark mb-1">Tạo Tài Khoản Mới</h4>
-            <p class="text-muted small">Điền thông tin để bắt đầu sử dụng hệ thống</p>
+            <h4 class="fw-bold text-dark mb-1">Tạo Tài Khoản</h4>
+            <p class="text-muted small">Điền thông tin để tham gia hệ thống</p>
         </div>
 
-        <form action="login.html"> <div class="mb-3">
-                <label for="fullname" class="form-label fw-semibold small">Họ và tên</label>
-                <input type="text" class="form-control" id="fullname" placeholder="VD: Nguyễn Văn A" required>
+        <form action="/register" method="POST">
+            <div class="mb-3">
+                <label for="fullname" class="form-label fw-semibold small text-secondary">Họ và tên</label>
+                <input type="text" class="form-control bg-light" id="fullname" name="fullname"
+                       placeholder="VD: Nguyễn Văn A" required>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-6">
-                    <label for="role" class="form-label fw-semibold small">Bạn là</label>
-                    <select class="form-select" id="role" required>
+                    <label for="role" class="form-label fw-semibold small text-secondary">Chức vụ</label>
+                    <select class="form-select bg-light" id="role" name="role" required>
                         <option value="student" selected>Sinh viên</option>
                         <option value="teacher">Giảng viên</option>
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="code" class="form-label fw-semibold small">MSSV / Mã GV</label>
-                    <input type="text" class="form-control" id="code" placeholder="Nhập mã số" required>
+                <div class="col-md-6 mt-3 mt-md-0">
+                    <label for="username" class="form-label fw-semibold small text-secondary">Tài khoản
+                        (Username)</label>
+                    <input type="text" class="form-control bg-light" id="username" name="username"
+                           placeholder="Nhập mã SV/GV" required>
                 </div>
             </div>
 
             <div class="mb-3">
-                <label for="email" class="form-label fw-semibold small">Email trường cấp</label>
-                <input type="email" class="form-control" id="email" placeholder="example@student.edu.vn" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label fw-semibold small">Mật khẩu</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
-                    <input type="password" class="form-control" id="password" placeholder="Tạo mật khẩu" required>
-                </div>
+                <label for="password" class="form-label fw-semibold small text-secondary">Mật khẩu</label>
+                <input type="password" class="form-control bg-light" id="password" name="password"
+                       placeholder="Tạo mật khẩu" required>
             </div>
 
             <div class="mb-4">
-                <label for="confirm_password" class="form-label fw-semibold small">Xác nhận mật khẩu</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-light"><i class="fa-solid fa-check-circle text-muted"></i></span>
-                    <input type="password" class="form-control" id="confirm_password" placeholder="Nhập lại mật khẩu" required>
-                </div>
+                <label for="confirm_password" class="form-label fw-semibold small text-secondary">Xác nhận mật
+                    khẩu</label>
+                <input type="password" class="form-control bg-light" id="confirm_password" name="confirm_password"
+                       placeholder="Nhập lại mật khẩu" required>
             </div>
 
-            <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3">
+            <button type="submit" class="btn btn-success w-100 fw-bold py-2 mb-3 rounded-3 shadow-sm">
                 Đăng Ký Tài Khoản
             </button>
         </form>
 
-        <div class="text-center mt-2 border-top pt-3">
-            <p class="small text-muted mb-0">Đã có tài khoản? <a href="login.html" class="fw-bold text-decoration-none">Đăng nhập tại đây</a></p>
+        <div class="text-center border-top pt-3">
+            <p class="small text-muted mb-0">Đã có tài khoản? <a href="/login" class="fw-bold text-decoration-none">Đăng
+                nhập tại đây</a></p>
         </div>
     </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}
