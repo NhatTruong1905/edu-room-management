@@ -16,6 +16,11 @@
         </div>
 
         <form action="/register" method="POST">
+            {% if err_msg %}
+            <div class="alert alert-danger text-center shadow-sm rounded-3 fw-semibold small py-2 mb-3">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> {{ err_msg }}
+            </div>
+            {% endif %}
             <div class="mb-3">
                 <label for="fullname" class="form-label fw-semibold small text-secondary">Họ và tên</label>
                 <input type="text" class="form-control bg-light" id="fullname" name="fullname"
@@ -26,8 +31,12 @@
                 <div class="col-md-6">
                     <label for="role" class="form-label fw-semibold small text-secondary">Chức vụ</label>
                     <select class="form-select bg-light" id="role" name="role" required>
-                        <option value="student" selected>Sinh viên</option>
-                        <option value="teacher">Giảng viên</option>
+                        {% if roles %}
+                        <option value="" selected>-- Chọn vai trò --</option>
+                        {% for r in roles %}
+                        <option value="{{r.name}}">{{r.name}}</option>
+                        {% endfor %}
+                        {% endif %}
                     </select>
                 </div>
                 <div class="col-md-6 mt-3 mt-md-0">
