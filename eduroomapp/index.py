@@ -1,4 +1,6 @@
-from flask import render_template, request, redirect
+from datetime import datetime
+
+from flask import render_template, request, redirect, flash, jsonify
 from eduroomapp import app, dao
 from flask_login import login_user, logout_user, login_required, current_user
 from eduroomapp import login
@@ -13,7 +15,7 @@ def home():
 @app.route('/booking')
 @login_required
 def booking_dashboard():
-    return render_template('index.html')
+    return render_template('booking.html')
 
 
 @app.route('/login')
@@ -23,26 +25,29 @@ def login_view():
 
 @app.route('/register')
 def register_view():
-    return render_template('register.html')
+    roles = dao.get_user_role()
+    return render_template('register.html', roles=roles)
 
 
 @app.route('/register', methods=['post'])
 def register_process():
+    roles = dao.get_user_role()
     data = request.form
 
     password = data.get('password')
-    confirm = data.get('confirm')
+    confirm = data.get('confirm_password')
     if password != confirm:
         err_msg = 'Mật khẩu không khớp!'
-        return render_template('register.html', err_msg=err_msg)
+        return render_template('register.html', err_msg=err_msg, roles=roles)
 
     try:
-        add_user(fullname=data.get('fullname'), username=data.get('username'), password=password)
+        add_user(fullname=data.get('fullname'), username=data.get('username'), password=password,
+                 user_role=data.get('role'))
+
+        flash('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success')
         return redirect('/login')
-    except ValueError as ex:
-        return render_template('register.html', err_msg=str(ex))
     except Exception as ex:
-        return render_template('register.html', err_msg=str(ex))
+        return render_template('register.html', err_msg=str(ex), roles=roles)
 
 
 @app.route('/logout')
@@ -69,6 +74,37 @@ def login_process():
             return "Tài khoản hoặc mật khẩu không chính xác!"
 
     return render_template('login.html')
+
+
+@app.route('/api/rooms', methods=['GET'])
+def api_get_rooms():
+    date_str = request.args.get('date')
+    start_time_str = request.args.get('start_time')
+    end_time_str = request.args.get('end_time')
+    capacity = request.args.get('capacity')
+
+    if not (date_str and start_time_str and end_time_str):
+        return jsonify({"error": "Vui lòng chọn đầy đủ ngày và giờ"}), 400
+
+    try:
+        start_time = datetime.strptime(f"{date_str} {start_time_str}", "%Y-%m-%d %H:%M")
+        end_time = datetime.strptime(f"{date_str} {end_time_str}", "%Y-%m-%d %H:%M")
+
+        rooms = dao.get_rooms_by_date_and_time(start_time, end_time, capacity)
+
+        room_list = []
+        for r in rooms:
+            room_list.append({
+                "id": r.id,
+                "name": r.name,
+                "capacity": r.capacity,
+                "status": r.status.name
+            })
+
+        return jsonify({"rooms": room_list}), 200
+
+    except ValueError:
+        return jsonify({"error": "Định dạng ngày giờ không hợp lệ!"}), 400
 
 
 @login.user_loader
