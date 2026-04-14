@@ -5,11 +5,24 @@
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center py-5" style="min-height: 75vh;">
     <div class="card shadow-lg border-0 rounded-4 p-4 p-md-5" style="max-width: 450px; width: 100%;">
-        
+
         <div class="text-center mb-4">
-            <div class="bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 70px; height: 70px;">
+            <div class="bg-primary bg-opacity-10 text-primary d-inline-flex align-items-center justify-content-center rounded-circle mb-3"
+                 style="width: 70px; height: 70px;">
                 <i class="fa-solid fa-user-lock fs-2"></i>
             </div>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show text-center shadow-sm rounded-3 fw-semibold small py-2 mb-4"
+                 role="alert">
+                <i class="fa-solid fa-circle-check me-1"></i> {{ message }}
+                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"
+                        style="padding: 0.75rem 1rem;"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
             <h4 class="fw-bold text-dark mb-1">Đăng Nhập Hệ Thống</h4>
             <p class="text-muted small">Vui lòng xác thực để tiếp tục</p>
         </div>
@@ -18,8 +31,10 @@
             <div class="mb-3">
                 <label for="username" class="form-label fw-semibold small text-secondary">Tài khoản (Username)</label>
                 <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-user text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0 ps-0 bg-light" id="username" name="username" placeholder="Nhập tài khoản" required>
+                    <span class="input-group-text bg-light border-end-0"><i
+                            class="fa-solid fa-user text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0 bg-light" id="username" name="username"
+                           placeholder="Nhập tài khoản" required>
                 </div>
             </div>
 
@@ -29,8 +44,10 @@
                     <a href="#" class="text-decoration-none small fw-medium">Quên mật khẩu?</a>
                 </div>
                 <div class="input-group">
-                    <span class="input-group-text bg-light border-end-0"><i class="fa-solid fa-lock text-muted"></i></span>
-                    <input type="password" class="form-control border-start-0 ps-0 bg-light" id="password" name="password" placeholder="Nhập mật khẩu" required>
+                    <span class="input-group-text bg-light border-end-0"><i
+                            class="fa-solid fa-lock text-muted"></i></span>
+                    <input type="password" class="form-control border-start-0 ps-0 bg-light" id="password"
+                           name="password" placeholder="Nhập mật khẩu" required>
                 </div>
             </div>
 
@@ -40,7 +57,9 @@
         </form>
 
         <div class="text-center border-top pt-3">
-            <p class="small text-muted mb-0">Chưa có tài khoản? <a href="/register" class="fw-bold text-decoration-none">Đăng ký ngay</a></p>
+            <p class="small text-muted mb-0">Chưa có tài khoản? <a href="/register"
+                                                                   class="fw-bold text-decoration-none">Đăng ký ngay</a>
+            </p>
         </div>
     </div>
 </div>
