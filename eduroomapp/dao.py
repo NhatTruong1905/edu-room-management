@@ -41,30 +41,42 @@ def get_rooms():
 
 
 def get_rooms_by_date_and_time(start_time, end_time, capacity=None, page=1):
-    page_size = app.config["PAGE_SIZE"]
+    booked_subquery = db.session.query(Booking.room_id).filter(
+        Booking.start_time < end_time,
+        Booking.end_time > start_time,
+        Booking.status == BookingStatus.CONFIRMED
+    ).subquery()
 
-    query = db.session.query(Room).outerjoin(
-        Booking,
-        and_(
-            Room.id == Booking.room_id,
-            Booking.start_time < end_time,
-            Booking.end_time > start_time,
-            Booking.status == BookingStatus.CONFIRMED
-        )
-    ).filter(
-        Room.status == RoomStatus.AVAILABLE,
-        Booking.id.is_(None)
+    query = db.session.query(
+        Room,
+        booked_subquery.c.room_id.isnot(None).label('is_booked')
+    ).outerjoin(
+        booked_subquery, Room.id == booked_subquery.c.room_id
     )
 
     if capacity:
         try:
-            capacity_val = int(capacity)
-            query = query.filter(Room.capacity >= capacity_val)
+            query = query.filter(Room.capacity >= int(capacity))
         except ValueError:
             pass
 
     total_count = query.count()
-
-    offset = (page - 1) * page_size
-    rooms = query.offset(offset).limit(page_size).all()
+    offset = (page - 1) * app.config["PAGE_SIZE"]
+    rooms = query.offset(offset).limit(app.config["PAGE_SIZE"]).all()
     return rooms, total_count
+
+
+def add_booking(user_id, room_id, start_time, end_time):
+    booking = Booking(
+        user_id=user_id,
+        room_id=room_id,
+        start_time=start_time,
+        end_time=end_time,
+        status=BookingStatus.CONFIRMED
+    )
+    db.session.add(booking)
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Lỗi lưu đặt phòng: {e}")

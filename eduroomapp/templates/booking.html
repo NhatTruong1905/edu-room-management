@@ -121,16 +121,17 @@
                 </div>
 
                 <div class="card-body p-4">
-                    <input type="hidden" id="hidden_date">
-                    <input type="hidden" id="hidden_start_time">
-                    <input type="hidden" id="hidden_end_time">
-                    <div id="room-list-container" class="row g-3">
-                        <div class="col-12 text-center py-5 text-muted">
-                            <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
-                            <p>Vui lòng chọn thời gian để tìm phòng.</p>
+                    <form action="/api/bookings" method="POST" id="booking-form">
+                        <input type="hidden" name="booking_date" id="hidden_date">
+                        <input type="hidden" name="booking_start_time" id="hidden_start_time">
+                        <input type="hidden" name="booking_end_time" id="hidden_end_time">
+                        <div id="room-list-container" class="row g-3">
+                            <div class="col-12 text-center py-5 text-muted">
+                                <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
+                                <p>Vui lòng chọn thời gian để tìm phòng.</p>
+                            </div>
                         </div>
-                    </div>
-
+                    </form>
                     <nav aria-label="Page navigation" class="mt-4">
                         <ul class="pagination pagination-sm justify-content-center mb-0" id="pagination-container">
                         </ul>
@@ -172,7 +173,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 </div>

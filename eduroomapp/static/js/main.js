@@ -72,25 +72,43 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             data.rooms.forEach(r => {
-                const isAvail = (r.status === 'AVAILABLE');
+                let cardClass = '';
+                let titleClass = '';
+                let statusBadge = '';
+                let actionBtn = '';
+
+                if (r.status === 'AVAILABLE') {
+                    cardClass = 'border-primary bg-primary bg-opacity-10';
+                    titleClass = 'text-primary';
+                    statusBadge = '<span class="badge bg-success rounded-pill px-2 py-1">Sẵn sàng</span>';
+                    actionBtn = `<button type="submit" name="room_id" value="${r.id}" class="btn btn-primary btn-sm fw-semibold shadow-sm px-3">Đặt ngay</button>`;
+                } else if (r.status === 'BOOKED') {
+                    cardClass = 'room-card-disabled shadow-none';
+                    titleClass = 'text-secondary';
+                    statusBadge = '<span class="badge bg-warning text-dark rounded-pill px-2 py-1">Kín lịch</span>';
+                    actionBtn = `<button type="button" disabled class="btn btn-secondary btn-sm px-2">Đã có người đặt</button>`;
+                } else {
+                    cardClass = 'room-card-disabled shadow-none';
+                    titleClass = 'text-secondary';
+                    statusBadge = '<span class="badge bg-danger rounded-pill px-2 py-1">Bảo trì</span>';
+                    actionBtn = `<button type="button" disabled class="btn btn-secondary btn-sm px-2">Đã khóa</button>`;
+                }
+
                 container.innerHTML += `
-                        <div class="col-md-6">
-                            <div class="card h-100 rounded-3 ${isAvail ? 'border-primary bg-primary bg-opacity-10' : 'room-card-disabled'}">
-                                <div class="card-body p-3">
-                                    <div class="d-flex justify-content-between align-items-center mb-3">
-                                        <h5 class="card-title ${isAvail ? 'text-primary' : 'text-secondary'} fw-bold mb-0">${r.name}</h5>
-                                        <span class="badge ${isAvail ? 'bg-success' : 'bg-danger'} rounded-pill px-2 py-1">
-                                            ${isAvail ? 'Sẵn sàng' : 'Bảo trì'}
-                                        </span>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-end">
-                                        <small class="text-muted mb-1"><i class="fa-solid fa-users me-1"></i> ${r.capacity} chỗ</small>
-                                        ${isAvail ? `<button type="submit" name="room_id" value="${r.id}" class="btn btn-primary btn-sm fw-semibold shadow-sm px-3">Đặt ngay</button>`
-                    : `<button type="button" disabled class="btn btn-secondary btn-sm px-2">Đã khóa</button>`}
-                                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100 rounded-3 ${cardClass}">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title ${titleClass} fw-bold mb-0">${r.name}</h5>
+                                    ${statusBadge}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <small class="text-muted"><i class="fa-solid fa-users me-1"></i> ${r.capacity} chỗ</small>
+                                    ${actionBtn}
                                 </div>
                             </div>
-                        </div>`;
+                        </div>
+                    </div>`;
             });
 
             renderPagination(data.total_pages, data.current_page);

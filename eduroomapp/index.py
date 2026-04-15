@@ -96,15 +96,21 @@ def api_get_rooms():
 
         rooms, total_count = dao.get_rooms_by_date_and_time(start_time, end_time, capacity, page)
 
-        page_size = app.config.get("PAGE_SIZE", 6)
-        total_pages = math.ceil(total_count / page_size)
+        total_pages = math.ceil(total_count / app.config["PAGE_SIZE"])
         room_list = []
-        for r in rooms:
+        for r, is_booked in rooms:
+            if is_booked:
+                final_status = "BOOKED"
+            elif r.status.name == "MAINTENANCE":
+                final_status = "MAINTENANCE"
+            else:
+                final_status = "AVAILABLE"
+
             room_list.append({
                 "id": r.id,
                 "name": r.name,
                 "capacity": r.capacity,
-                "status": r.status.name
+                "status": final_status
             })
 
         return jsonify({
@@ -113,9 +119,36 @@ def api_get_rooms():
             "current_page": page,
             "total_count": total_count
         }), 200
-
     except ValueError:
         return jsonify({"error": "Định dạng ngày giờ không hợp lệ!"}), 400
+
+
+@app.route('/api/bookings', methods=['POST'])
+@login_required
+def api_create_booking():
+    room_id = request.form.get('room_id')
+    date_str = request.form.get('booking_date')
+    start_str = request.form.get('booking_start_time')
+    end_str = request.form.get('booking_end_time')
+
+    if not all([room_id, date_str, start_str, end_str]):
+        flash('Lỗi: Thiếu thông tin đặt phòng!', 'danger')
+        return redirect('/booking')
+
+    try:
+        start_dt = datetime.strptime(f"{date_str} {start_str}", "%Y-%m-%d %H:%M")
+        end_dt = datetime.strptime(f"{date_str} {end_str}", "%Y-%m-%d %H:%M")
+        dao.add_booking(
+            user_id=current_user.id,
+            room_id=room_id,
+            start_time=start_dt,
+            end_time=end_dt
+        )
+
+        flash('Đặt phòng thành công!', 'success')
+    except Exception as ex:
+        flash(f'Đặt phòng thất bại. Vui lòng thử lại! \n Lỗi: {str(ex)}', 'danger')
+    return redirect('/booking')
 
 
 @login.user_loader
