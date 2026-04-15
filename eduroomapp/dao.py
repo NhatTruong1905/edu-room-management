@@ -4,7 +4,7 @@ import re
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 
-from eduroomapp import db
+from eduroomapp import db, app
 from eduroomapp.models import User, UserRole, Room, RoomStatus, Booking, BookingStatus
 
 
@@ -40,7 +40,9 @@ def get_rooms():
     return Room.query.all()
 
 
-def get_rooms_by_date_and_time(start_time, end_time, capacity=None):
+def get_rooms_by_date_and_time(start_time, end_time, capacity=None, page=1):
+    page_size = app.config["PAGE_SIZE"]
+
     query = db.session.query(Room).outerjoin(
         Booking,
         and_(
@@ -60,4 +62,9 @@ def get_rooms_by_date_and_time(start_time, end_time, capacity=None):
             query = query.filter(Room.capacity >= capacity_val)
         except ValueError:
             pass
-    return query.all()
+
+    total_count = query.count()
+
+    offset = (page - 1) * page_size
+    rooms = query.offset(offset).limit(page_size).all()
+    return rooms, total_count

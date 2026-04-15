@@ -69,14 +69,14 @@
                         <div class="mb-3">
                             <label for="date" class="form-label fw-semibold small text-secondary">Ngày sử dụng</label>
                             <input type="date" class="form-control bg-light" id="date" name="date"
-                                   value="{{ request.args.get('date', '') }}" required>
+                                   value="{{ request.args.get('date', '') }}">
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-6">
                                 <label for="start_time" class="form-label fw-semibold small text-secondary">Từ
                                     giờ</label>
-                                <select class="form-select bg-light" id="start_time" name="start_time" required>
+                                <select class="form-select bg-light" id="start_time" name="start_time">
                                     <option value="">-- Chọn --</option>
                                     {% for h in range(7, 21) %}
                                     <option value="{{ '%02d'|format(h) }}:00">{{ '%02d'|format(h) }}:00</option>
@@ -86,7 +86,7 @@
                             <div class="col-6">
                                 <label for="end_time" class="form-label fw-semibold small text-secondary">Đến
                                     giờ</label>
-                                <select class="form-select bg-light" id="end_time" name="end_time" required>
+                                <select class="form-select bg-light" id="end_time" name="end_time">
                                     <option value="">-- Chọn --</option>
                                     {% for h in range(8, 22) %}
                                     <option value="{{ '%02d'|format(h) }}:00">{{ '%02d'|format(h) }}:00</option>
@@ -111,7 +111,6 @@
         </div>
 
         <div class="col-lg-8">
-
             <div class="card shadow-sm border-0 rounded-4 mb-4">
                 <div class="card-header bg-white border-bottom py-3 rounded-top-4 d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0 fw-bold">Phòng trống khả dụng</h5>
@@ -122,50 +121,59 @@
                 </div>
 
                 <div class="card-body p-4">
+                    <input type="hidden" id="hidden_date">
+                    <input type="hidden" id="hidden_start_time">
+                    <input type="hidden" id="hidden_end_time">
                     <div id="room-list-container" class="row g-3">
                         <div class="col-12 text-center py-5 text-muted">
                             <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
                             <p>Vui lòng chọn thời gian để tìm phòng.</p>
                         </div>
                     </div>
+
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination pagination-sm justify-content-center mb-0" id="pagination-container">
+                        </ul>
+                    </nav>
                 </div>
             </div>
-
-            <div class="card shadow-sm border-0 rounded-4">
-                <div class="card-header bg-white border-bottom py-3 rounded-top-4">
-                    <h5 class="card-title mb-1 fw-bold">Phòng bạn đang giữ</h5>
-                    <small class="text-muted">Chỉ hủy được trước 30 phút so với giờ bắt đầu.</small>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead class="table-light text-muted small">
-                            <tr>
-                                <th scope="col" class="ps-4 py-3">Phòng</th>
-                                <th scope="col" class="py-3">Thời gian</th>
-                                <th scope="col" class="py-3">Tình trạng</th>
-                                <th scope="col" class="text-end pe-4 py-3">Thao tác</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="ps-4 py-3 fw-semibold text-dark">A105 <br><span
-                                        class="text-muted small fw-normal">50 chỗ</span></td>
-                                <td class="py-3">Hôm nay<br><span class="fw-bold text-primary">14:00 - 16:00</span></td>
-                                <td class="py-3"><span
-                                        class="badge bg-light text-dark border px-2 py-1">Sắp diễn ra</span></td>
-                                <td class="text-end pe-4 py-3">
-                                    <button class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
         </div>
+
+        <div class="card shadow-sm border-0 rounded-4">
+            <div class="card-header bg-white border-bottom py-3 rounded-top-4">
+                <h5 class="card-title mb-1 fw-bold">Phòng bạn đang giữ</h5>
+                <small class="text-muted">Chỉ hủy được trước 30 phút so với giờ bắt đầu.</small>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light text-muted small">
+                        <tr>
+                            <th scope="col" class="ps-4 py-3">Phòng</th>
+                            <th scope="col" class="py-3">Thời gian</th>
+                            <th scope="col" class="py-3">Tình trạng</th>
+                            <th scope="col" class="text-end pe-4 py-3">Thao tác</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td class="ps-4 py-3 fw-semibold text-dark">A105 <br><span
+                                    class="text-muted small fw-normal">50 chỗ</span></td>
+                            <td class="py-3">Hôm nay<br><span class="fw-bold text-primary">14:00 - 16:00</span></td>
+                            <td class="py-3"><span
+                                    class="badge bg-light text-dark border px-2 py-1">Sắp diễn ra</span></td>
+                            <td class="text-end pe-4 py-3">
+                                <button class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy
+                                </button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
+</div>
 </div>
 {% endblock %}
