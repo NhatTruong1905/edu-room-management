@@ -21,7 +21,7 @@ class RoomStatus(enum.Enum):
 
 class Room(BaseModel):
     __tablename__ = 'room'
-    name = Column(String(50), nullable=False)
+    name = Column(String(50), nullable=False, unique=True)
     capacity = Column(Integer, nullable=False)
     status = Column(Enum(RoomStatus), default=RoomStatus.AVAILABLE, nullable=False)
 
@@ -38,7 +38,7 @@ class User(BaseModel, UserMixin):
     __tablename__ = 'user'
 
     fullname = Column(String(100), nullable=False)
-    username = Column(String(100), nullable=False)
+    username = Column(String(100), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     user_role = Column(Enum(UserRole), nullable=False)
     locked_until = Column(DateTime, nullable=True)
