@@ -11,18 +11,6 @@
                  style="width: 70px; height: 70px;">
                 <i class="fa-solid fa-user-lock fs-2"></i>
             </div>
-            {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }} alert-dismissible fade show text-center shadow-sm rounded-3 fw-semibold small py-2 mb-4"
-                 role="alert">
-                <i class="fa-solid fa-circle-check me-1"></i> {{ message }}
-                <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"
-                        style="padding: 0.75rem 1rem;"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
             <h4 class="fw-bold text-dark mb-1">Đăng Nhập Hệ Thống</h4>
             <p class="text-muted small">Vui lòng xác thực để tiếp tục</p>
         </div>
