@@ -44,16 +44,20 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="alert alert-{{ category }} alert-dismissible fade show text-center shadow-sm rounded-3 fw-semibold small py-2 mb-4"
+        <div class="alert alert-{{ category }} alert-dismissible fade show text-center shadow-sm rounded-3 fw-semibold small py-2 mb-4 d-flex align-items-center justify-content-center"
              role="alert">
-            {% if category == 'success' %}
-            <i class="fa-solid fa-circle-check me-1"></i>
-            {% elif category == 'danger' %}
-            <i class="fa-solid fa-circle-xmark me-1"></i>
-            {% else %}
-            <i class="fa-solid fa-circle-info me-1"></i>
-            {% endif %}
-            {{ message }}
+            <div>
+                {% if category == 'success' %}
+                <i class="fa-solid fa-circle-check me-1"></i>
+                {% elif category == 'danger' %}
+                <i class="fa-solid fa-circle-xmark me-1"></i>
+                {% elif category == 'warning' %}
+                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                {% else %}
+                <i class="fa-solid fa-circle-info me-1"></i>
+                {% endif %}
+                <span>{{ message | replace('\n', '<br>') | safe }}</span>
+            </div>
             <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Close"
                     style="padding: 0.75rem 1rem;"></button>
         </div>
