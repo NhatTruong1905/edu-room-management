@@ -182,15 +182,22 @@ def api_create_booking():
 @login_required
 def api_get_bookings():
     bookings = dao.get_bookings_user(user_id=current_user.id)
+    now = datetime.now()
 
     bookings_list = []
     for b in bookings:
+        if b.status.name == 'CANCELED':
+            display_status = 'CANCELED'
+        elif b.end_time < now:
+            display_status = 'COMPLETED'
+        else:
+            display_status = 'UPCOMING'
         bookings_list.append({
             "id": b.id,
             "date": b.start_time.strftime('%d/%m/%Y'),
             "time_range": f"{b.start_time.strftime('%H:%M')} - {b.end_time.strftime('%H:%M')}",
             "capacity": b.room.capacity,
-            "status": b.status.name,
+            "status": display_status,
             "name_room": b.room.name
         })
 

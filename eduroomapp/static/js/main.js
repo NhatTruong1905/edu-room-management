@@ -194,12 +194,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 let statusHtml = '';
                 let actionHtml = '';
 
-                if (b.status === 'CONFIRMED') {
-                    statusHtml = '<span class="badge bg-light text-success border px-2 py-1">Đã xác nhận</span>';
+                if (b.status === 'UPCOMING') {
+                    statusHtml = '<span class="badge bg-light text-success border px-2 py-1">Sắp diễn ra</span>';
                     actionHtml = `<button type="button" class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy</button>`;
                 } else if (b.status === 'CANCELED') {
                     statusHtml = '<span class="badge bg-light text-secondary border px-2 py-1">Đã hủy</span>';
                     actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Đã hủy</button>`;
+                } else if (b.status === 'COMPLETED') {
+                    statusHtml = '<span class="badge bg-light text-muted border px-2 py-1">Đã kết thúc</span>';
+                    actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Hết hạn</button>`;
                 }
 
                 tbody.innerHTML += `
