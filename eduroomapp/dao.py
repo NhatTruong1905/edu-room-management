@@ -3,6 +3,7 @@ import random
 import re
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
+from sqlalchemy.sql.functions import func
 
 from eduroomapp import db, app
 from eduroomapp.models import User, UserRole, Room, RoomStatus, Booking, BookingStatus
@@ -80,3 +81,40 @@ def add_booking(user_id, room_id, start_time, end_time):
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Lỗi lưu đặt phòng: {e}")
+
+
+def get_bookings_user(user_id):
+    bookings = (db.session.query(Booking)
+                .filter(Booking.user_id == user_id)
+                .order_by(Booking.created_at.desc())
+                .all())
+    return bookings
+
+
+def get_booking_count_today(user_id, today_date):
+    count = db.session.query(Booking).filter(
+        Booking.user_id == user_id,
+        func.date(Booking.start_time) == today_date,
+        Booking.status == BookingStatus.CONFIRMED
+    ).count()
+    return count
+
+
+def get_booking_count_week(user_id, start_week, end_week):
+    count = db.session.query(Booking).filter(
+        Booking.user_id == user_id,
+        func.date(Booking.start_time) >= start_week,
+        func.date(Booking.start_time) <= end_week,
+        Booking.status == BookingStatus.CONFIRMED
+    ).count()
+    return count
+
+
+def get_cancel_count_week(user_id, start_week, end_week):
+    count = db.session.query(Booking).filter(
+        Booking.user_id == user_id,
+        func.date(Booking.start_time) >= start_week,
+        func.date(Booking.start_time) <= end_week,
+        Booking.status == BookingStatus.CANCELED
+    ).count()
+    return count

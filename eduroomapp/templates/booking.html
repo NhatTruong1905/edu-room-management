@@ -11,7 +11,7 @@
                 <div class="card-body p-4">
                     <p class="text-muted mb-1 small fw-bold text-uppercase">Đã đặt hôm nay</p>
                     <div class="d-flex align-items-baseline">
-                        <h2 class="text-primary fw-bold mb-0 me-2">1</h2>
+                        <h2 class="text-primary fw-bold mb-0 me-2">{{ today_bookings }}</h2>
                         <span class="text-secondary fw-medium">/ 3 phòng</span>
                     </div>
                 </div>
@@ -26,7 +26,7 @@
                 <div class="card-body p-4">
                     <p class="text-muted mb-1 small fw-bold text-uppercase">Đã đặt tuần này</p>
                     <div class="d-flex align-items-baseline">
-                        <h2 class="text-success fw-bold mb-0 me-2">4</h2>
+                        <h2 class="text-success fw-bold mb-0 me-2">{{ week_bookings }}</h2>
                         <span class="text-secondary fw-medium">/ 10 phòng</span>
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 <div class="card-body p-4">
                     <p class="text-muted mb-1 small fw-bold text-uppercase">Lượt hủy tuần này</p>
                     <div class="d-flex align-items-baseline">
-                        <h2 class="text-warning fw-bold mb-0 me-2">1</h2>
+                        <h2 class="text-warning fw-bold mb-0 me-2">{{ week_cancels }}</h2>
                         <span class="text-secondary fw-medium">/ 5 lần</span>
                     </div>
                 </div>
@@ -156,16 +156,11 @@
                             <th scope="col" class="text-end pe-4 py-3">Thao tác</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="user-bookings-list">
                         <tr>
-                            <td class="ps-4 py-3 fw-semibold text-dark">A105 <br><span
-                                    class="text-muted small fw-normal">50 chỗ</span></td>
-                            <td class="py-3">Hôm nay<br><span class="fw-bold text-primary">14:00 - 16:00</span></td>
-                            <td class="py-3"><span
-                                    class="badge bg-light text-dark border px-2 py-1">Sắp diễn ra</span></td>
-                            <td class="text-end pe-4 py-3">
-                                <button class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy
-                                </button>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <div class="spinner-border spinner-border-sm text-primary me-2"></div>
+                                Đang tải dữ liệu...
                             </td>
                         </tr>
                         </tbody>

@@ -1,5 +1,5 @@
 import math
-from datetime import datetime
+from datetime import datetime, date, timedelta
 
 from flask import render_template, request, redirect, flash, jsonify
 from eduroomapp import app, dao
@@ -16,7 +16,18 @@ def home():
 @app.route('/booking')
 @login_required
 def booking_dashboard():
-    return render_template('booking.html')
+    today = date.today()
+    start_week = today - timedelta(days=today.weekday())
+    end_week = start_week + timedelta(days=6)
+
+    today_bookings = dao.get_booking_count_today(current_user.id, today)
+    week_bookings = dao.get_booking_count_week(current_user.id, start_week, end_week)
+    week_cancels = dao.get_cancel_count_week(current_user.id, start_week, end_week)
+
+    return render_template('booking.html',
+                           today_bookings=today_bookings,
+                           week_bookings=week_bookings,
+                           week_cancels=week_cancels)
 
 
 @app.route('/login')
@@ -138,6 +149,22 @@ def api_create_booking():
     try:
         start_dt = datetime.strptime(f"{date_str} {start_str}", "%Y-%m-%d %H:%M")
         end_dt = datetime.strptime(f"{date_str} {end_str}", "%Y-%m-%d %H:%M")
+
+        booking_date = start_dt.date()
+        count_booking_today = dao.get_booking_count_today(user_id=current_user.id, today_date=booking_date)
+        if count_booking_today >= 3:
+            flash('Đã giới hạn đặt quá 3 phòng / ngày!', 'warning')
+            return redirect('/booking')
+
+        start_week = booking_date - timedelta(days=booking_date.weekday())
+        end_week = start_week + timedelta(days=6)
+        count_booking_week = dao.get_booking_count_week(user_id=current_user.id,
+                                                        start_week=start_week,
+                                                        end_week=end_week)
+        if count_booking_week >= 10:
+            flash('Đã giới hạn quá 10 phòng / tuần!', 'warning')
+            return redirect('/booking')
+
         dao.add_booking(
             user_id=current_user.id,
             room_id=room_id,
@@ -149,6 +176,25 @@ def api_create_booking():
     except Exception as ex:
         flash(f'Đặt phòng thất bại. Vui lòng thử lại! \n Lỗi: {str(ex)}', 'danger')
     return redirect('/booking')
+
+
+@app.route('/api/bookings', methods=['GET'])
+@login_required
+def api_get_bookings():
+    bookings = dao.get_bookings_user(user_id=current_user.id)
+
+    bookings_list = []
+    for b in bookings:
+        bookings_list.append({
+            "id": b.id,
+            "date": b.start_time.strftime('%d/%m/%Y'),
+            "time_range": f"{b.start_time.strftime('%H:%M')} - {b.end_time.strftime('%H:%M')}",
+            "capacity": b.room.capacity,
+            "status": b.status.name,
+            "name_room": b.room.name
+        })
+
+    return jsonify({"bookings": bookings_list}), 200
 
 
 @login.user_loader
