@@ -178,4 +178,48 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     }
+
+    function loadUserBookings() {
+        const tbody = document.getElementById('user-bookings-list');
+        if (!tbody) return;
+        fetch('/api/bookings').then(res => res.json()).then(data => {
+            tbody.innerHTML = '';
+
+            if (!data.bookings || data.bookings.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Bạn chưa có lịch đặt phòng nào.</td></tr>';
+                return;
+            }
+
+            data.bookings.forEach(b => {
+                let statusHtml = '';
+                let actionHtml = '';
+
+                if (b.status === 'CONFIRMED') {
+                    statusHtml = '<span class="badge bg-light text-success border px-2 py-1">Đã xác nhận</span>';
+                    actionHtml = `<button type="button" class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy</button>`;
+                } else if (b.status === 'CANCELED') {
+                    statusHtml = '<span class="badge bg-light text-secondary border px-2 py-1">Đã hủy</span>';
+                    actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Đã hủy</button>`;
+                }
+
+                tbody.innerHTML += `
+                        <tr>
+                            <td class="ps-4 py-3 fw-semibold text-dark">${b.name_room} <br>
+                                <span class="text-muted small fw-normal">${b.capacity} chỗ</span>
+                            </td>
+                            <td class="py-3">${b.date}<br>
+                                <span class="fw-bold text-primary">${b.time_range}</span>
+                            </td>
+                            <td class="py-3">${statusHtml}</td>
+                            <td class="text-end pe-4 py-3">${actionHtml}</td>
+                        </tr>
+                    `;
+            });
+        }).catch(err => {
+            console.error("Lỗi khi tải lịch đặt phòng:", err);
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Lỗi kết nối máy chủ!</td></tr>';
+        });
+    }
+
+    loadUserBookings();
 });
