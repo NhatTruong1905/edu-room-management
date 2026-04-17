@@ -1,6 +1,8 @@
 import hashlib
 import random
 import re
+from datetime import datetime, timedelta
+
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 from sqlalchemy.sql.functions import func
@@ -118,3 +120,34 @@ def get_cancel_count_week(user_id, start_week, end_week):
         Booking.status == BookingStatus.CANCELED
     ).count()
     return count
+
+
+def cancel_booking_logic(booking_id, user_id):
+    booking = db.session.query(Booking).filter(
+        Booking.id == booking_id,
+        Booking.user_id == user_id
+    ).first()
+
+    if not booking:
+        raise Exception("Không tìm thấy lịch đặt!")
+
+    now = datetime.now()
+    time_diff = booking.start_time - now
+    if time_diff < timedelta(minutes=30):
+        raise Exception("Không thể hủy vì chỉ còn chưa đầy 30 phút là đến giờ sử dụng!")
+
+    booking.status = BookingStatus.CANCELED
+
+    start_week = now.date() - timedelta(days=now.date().weekday())
+    end_week = start_week + timedelta(days=6)
+    cancel_count = get_cancel_count_week(user_id, start_week, end_week)
+
+    if cancel_count >= 5:
+        user = db.session.query(User).get(user_id)
+        user.locked_until = now + timedelta(hours=24)
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        raise Exception(f"Lỗi hệ thống: {e}")

@@ -179,33 +179,40 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    function loadUserBookings() {
-        const tbody = document.getElementById('user-bookings-list');
-        if (!tbody) return;
-        fetch('/api/bookings').then(res => res.json()).then(data => {
-            tbody.innerHTML = '';
+    loadUserBookings();
 
-            if (!data.bookings || data.bookings.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Bạn chưa có lịch đặt phòng nào.</td></tr>';
-                return;
+});
+
+window.loadUserBookings = function () {
+    const tbody = document.getElementById('user-bookings-list');
+    if (!tbody) return;
+    fetch('/api/bookings').then(res => res.json()).then(data => {
+        tbody.innerHTML = '';
+
+        if (!data.bookings || data.bookings.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Bạn chưa có lịch đặt phòng nào.</td></tr>';
+            return;
+        }
+
+        data.bookings.forEach(b => {
+            let statusHtml = '';
+            let actionHtml = '';
+
+            if (b.status === 'UPCOMING') {
+                statusHtml = '<span class="badge bg-light text-success border px-2 py-1">Sắp diễn ra</span>';
+                actionHtml = `<button type="button" class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3" onclick="cancelBooking(${b.id})">Hủy</button>`;
+            } else if (b.status === 'ONGOING') {
+                statusHtml = '<span class="badge bg-light text-primary border px-2 py-1">Đang diễn ra</span>';
+                actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Đang dùng</button>`;
+            } else if (b.status === 'CANCELED') {
+                statusHtml = '<span class="badge bg-light text-secondary border px-2 py-1">Đã hủy</span>';
+                actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Đã hủy</button>`;
+            } else if (b.status === 'COMPLETED') {
+                statusHtml = '<span class="badge bg-light text-muted border px-2 py-1">Đã kết thúc</span>';
+                actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Hết hạn</button>`;
             }
 
-            data.bookings.forEach(b => {
-                let statusHtml = '';
-                let actionHtml = '';
-
-                if (b.status === 'UPCOMING') {
-                    statusHtml = '<span class="badge bg-light text-success border px-2 py-1">Sắp diễn ra</span>';
-                    actionHtml = `<button type="button" class="btn btn-outline-danger btn-sm fw-semibold rounded-pill px-3">Hủy</button>`;
-                } else if (b.status === 'CANCELED') {
-                    statusHtml = '<span class="badge bg-light text-secondary border px-2 py-1">Đã hủy</span>';
-                    actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Đã hủy</button>`;
-                } else if (b.status === 'COMPLETED') {
-                    statusHtml = '<span class="badge bg-light text-muted border px-2 py-1">Đã kết thúc</span>';
-                    actionHtml = `<button type="button" class="btn btn-secondary btn-sm fw-semibold rounded-pill px-3" disabled>Hết hạn</button>`;
-                }
-
-                tbody.innerHTML += `
+            tbody.innerHTML += `
                         <tr>
                             <td class="ps-4 py-3 fw-semibold text-dark">${b.name_room} <br>
                                 <span class="text-muted small fw-normal">${b.capacity} chỗ</span>
@@ -217,12 +224,29 @@ document.addEventListener('DOMContentLoaded', function () {
                             <td class="text-end pe-4 py-3">${actionHtml}</td>
                         </tr>
                     `;
-            });
-        }).catch(err => {
-            console.error("Lỗi khi tải lịch đặt phòng:", err);
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Lỗi kết nối máy chủ!</td></tr>';
         });
-    }
+    }).catch(err => {
+        console.error("Lỗi khi tải lịch đặt phòng:", err);
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Lỗi kết nối máy chủ!</td></tr>';
+    });
+}
 
-    loadUserBookings();
-});
+window.cancelBooking = function (id) {
+    if (!confirm("Bạn có chắc chắn muốn hủy lịch đặt phòng này không?")) {
+        return;
+    }
+    fetch(`/api/bookings/${id}`, {
+        method: 'POST'
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert(data.message);
+            loadUserBookings();
+            location.reload();
+        } else {
+            alert("Lỗi: " + data.message);
+        }
+    }).catch(err => {
+        console.error('Lỗi khi hủy:', err);
+        alert("Lỗi kết nối đến máy chủ!");
+    });
+};

@@ -146,6 +146,10 @@ def api_create_booking():
         flash('Lỗi: Thiếu thông tin đặt phòng!', 'danger')
         return redirect('/booking')
 
+    if current_user.locked_until and current_user.locked_until > datetime.now():
+        flash('Tài khoản của bạn đang bị khóa quyền đặt phòng do hủy quá nhiều lần!', 'danger')
+        return redirect('/booking')
+
     try:
         start_dt = datetime.strptime(f"{date_str} {start_str}", "%Y-%m-%d %H:%M")
         end_dt = datetime.strptime(f"{date_str} {end_str}", "%Y-%m-%d %H:%M")
@@ -190,6 +194,8 @@ def api_get_bookings():
             display_status = 'CANCELED'
         elif b.end_time < now:
             display_status = 'COMPLETED'
+        elif b.start_time <= now <= b.end_time:
+            display_status = 'ONGOING'
         else:
             display_status = 'UPCOMING'
         bookings_list.append({
@@ -202,6 +208,16 @@ def api_get_bookings():
         })
 
     return jsonify({"bookings": bookings_list}), 200
+
+
+@app.route('/api/bookings/<int:id>', methods=['POST'])
+@login_required
+def api_cancel_booking(id):
+    try:
+        dao.cancel_booking_logic(booking_id=id, user_id=current_user.id)
+        return jsonify({"success": True, "message": "Hủy phòng thành công!"}), 200
+    except Exception as ex:
+        return jsonify({"success": False, "message": str(ex)}), 400
 
 
 @login.user_loader
