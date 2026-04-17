@@ -17,4 +17,6 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
     - name: Run tests
+	SECRET_KEY: "super_secret_key_for_testing"
+	DATABASE_URI: "sqlite:///:memory:"
       run: PYTHONPATH=eduroomapp pytest eduroomapp 
