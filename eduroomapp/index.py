@@ -6,6 +6,8 @@ from eduroomapp import app, dao, google, db, facebook
 from flask_login import login_user, logout_user, login_required, current_user
 from eduroomapp import login
 from eduroomapp.dao import add_user
+from eduroomapp.models import UserRole
+from eduroomapp.utils import permission
 
 
 @app.route('/')
@@ -14,7 +16,7 @@ def home():
 
 
 @app.route('/booking')
-@login_required
+@permission(allow={"roles": [UserRole.ADMIN], "access": False})
 def booking_dashboard():
     today = date.today()
     start_week = today - timedelta(days=today.weekday())
@@ -286,7 +288,7 @@ def api_get_bookings():
 
 
 @app.route('/api/bookings/<int:id>', methods=['POST'])
-@login_required
+@permission(allow={"roles": [UserRole.STUDENT, UserRole.TEACHER], "access": True})
 def api_cancel_booking(id):
     try:
         dao.cancel_booking_logic(booking_id=id, user_id=current_user.id)
