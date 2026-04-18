@@ -38,6 +38,7 @@ class User(BaseModel, UserMixin):
     __tablename__ = 'user'
 
     fullname = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, nullable=True)
     username = Column(String(100), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     user_role = Column(Enum(UserRole), nullable=False)

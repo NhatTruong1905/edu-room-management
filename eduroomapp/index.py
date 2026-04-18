@@ -48,13 +48,17 @@ def register_process():
 
     password = data.get('password')
     confirm = data.get('confirm_password')
+    email = data.get('email')
     if password != confirm:
         err_msg = 'Xác nhận mật khẩu không khớp!'
         return render_template('register.html', err_msg=err_msg, roles=roles)
 
     try:
-        add_user(fullname=data.get('fullname'), username=data.get('username'), password=password,
-                 user_role=data.get('role'))
+        add_user(fullname=data.get('fullname'),
+                 username=data.get('username'),
+                 password=password,
+                 user_role=data.get('role'),
+                 email=email)
 
         flash('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success')
         return redirect('/login')

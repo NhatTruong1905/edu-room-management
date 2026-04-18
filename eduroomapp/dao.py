@@ -25,12 +25,19 @@ def auth_user(username, password):
                              User.password == password).first()
 
 
-def add_user(fullname, username, password, user_role):
+def add_user(fullname, username, password, user_role, email):
     if User.query.filter(User.username == username).first():
         raise ValueError("Username đã tồn tại")
 
+    if User.query.filter(User.email == email).first():
+        raise ValueError("Địa chỉ Email này đã được đăng ký!")
+
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    u = User(fullname=fullname.strip(), username=username.strip(), password=password, user_role=user_role)
+    u = User(fullname=fullname.strip(),
+             username=username.strip(),
+             password=password,
+             user_role=user_role,
+             email=email.strip())
     db.session.add(u)
     try:
         db.session.commit()
