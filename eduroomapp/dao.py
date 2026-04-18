@@ -1,6 +1,7 @@
 import hashlib
 import random
 import re
+import secrets
 from datetime import datetime, timedelta
 
 from sqlalchemy.exc import IntegrityError
@@ -17,6 +18,14 @@ def get_user_role():
 
 def get_user_by_id(id):
     return User.query.get(id)
+
+
+def get_user_by_email(email):
+    return db.session.query(User).filter(User.email == email).first()
+
+
+def get_user_by_username(username):
+    return db.session.query(User).filter(User.username == username).first()
 
 
 def auth_user(username, password):
@@ -44,6 +53,67 @@ def add_user(fullname, username, password, user_role, email):
     except IntegrityError:
         db.session.rollback()
         raise Exception('Username đã tồn tại!')
+
+
+def create_user_from_google(google_email, google_name):
+    base_username = google_email.split('@')[0]
+    username = base_username
+
+    count = 1
+    while db.session.query(User).filter(User.username == username).first():
+        username = f"{base_username}{count}"
+        count += 1
+
+    random_password = secrets.token_hex(8)
+    hashed_password = str(hashlib.md5(random_password.encode('utf-8')).hexdigest())
+
+    user = User(
+        fullname=google_name,
+        username=username,
+        email=google_email,
+        password=hashed_password,
+        user_role=UserRole.STUDENT
+    )
+
+    db.session.add(user)
+    try:
+        db.session.commit()
+        return user
+    except Exception as e:
+        db.session.rollback()
+        raise Exception("Lỗi Database khi lưu tài khoản Google!")
+
+
+def create_user_from_facebook(fb_id, fb_name, fb_email):
+    if fb_email:
+        base_username = fb_email.split('@')[0]
+    else:
+        base_username = f"fb_{fb_id}"
+
+    username = base_username
+    count = 1
+    while db.session.query(User).filter(User.username == username).first():
+        username = f"{base_username}{count}"
+        count += 1
+
+    random_password = secrets.token_hex(8)
+    hashed_password = str(hashlib.md5(random_password.encode('utf-8')).hexdigest())
+
+    user = User(
+        fullname=fb_name,
+        username=username,
+        email=fb_email,
+        password=hashed_password,
+        user_role=UserRole.STUDENT
+    )
+
+    db.session.add(user)
+    try:
+        db.session.commit()
+        return user
+    except Exception as e:
+        db.session.rollback()
+        raise Exception("Lỗi Database khi lưu tài khoản Facebook!")
 
 
 def get_rooms():

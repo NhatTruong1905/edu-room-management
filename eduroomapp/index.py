@@ -1,8 +1,8 @@
 import math
 from datetime import datetime, date, timedelta
 
-from flask import render_template, request, redirect, flash, jsonify
-from eduroomapp import app, dao
+from flask import render_template, request, redirect, flash, jsonify, url_for
+from eduroomapp import app, dao, google, db, facebook
 from flask_login import login_user, logout_user, login_required, current_user
 from eduroomapp import login
 from eduroomapp.dao import add_user
@@ -33,6 +33,77 @@ def booking_dashboard():
 @app.route('/login')
 def login_view():
     return render_template('login.html')
+
+
+@app.route('/login/google')
+def login_google():
+    redirect_uri = url_for('authorize_google', _external=True)
+    return google.authorize_redirect(redirect_uri)
+
+
+@app.route('/login/facebook')
+def login_facebook():
+    redirect_uri = url_for('authorize_facebook', _external=True)
+    return facebook.authorize_redirect(redirect_uri)
+
+
+@app.route('/authorize/google')
+def authorize_google():
+    try:
+        token = google.authorize_access_token()
+        user_info = token.get('userinfo')
+    except Exception as e:
+        flash('Đăng nhập Google thất bại hoặc đã bị hủy!', 'danger')
+        return redirect('/login')
+
+    google_email = user_info.get('email')
+    google_name = user_info.get('name')
+
+    user = dao.get_user_by_email(google_email)
+
+    if not user:
+        try:
+            user = dao.create_user_from_google(google_email, google_name)
+        except Exception as e:
+            flash('Lỗi khi tạo tài khoản từ Google!', 'danger')
+            return redirect('/login')
+
+    login_user(user)
+    flash(f'Xin chào {user.fullname}, bạn đã đăng nhập thành công!', 'success')
+    return redirect('/')
+
+
+@app.route('/authorize/facebook')
+def authorize_facebook():
+    try:
+        token = facebook.authorize_access_token()
+        resp = facebook.get('me?fields=id,name,email')
+        user_info = resp.json()
+    except Exception as e:
+        flash('Đăng nhập Facebook thất bại hoặc đã bị hủy!', 'danger')
+        return redirect('/login')
+
+    facebook_id = user_info.get('id')
+    facebook_name = user_info.get('name')
+    facebook_email = user_info.get('email')
+
+    user = None
+    if facebook_email:
+        user = dao.get_user_by_email(facebook_email)
+    else:
+        username_fb = f"fb_{facebook_id}"
+        user = dao.get_user_by_username(username_fb)
+
+    if not user:
+        try:
+            user = dao.create_user_from_facebook(facebook_id, facebook_name, facebook_email)
+        except Exception as e:
+            flash('Lỗi khi tạo tài khoản từ Facebook!', 'danger')
+            return redirect('/login')
+
+    login_user(user)
+    flash(f'Xin chào {user.fullname}, bạn đã đăng nhập thành công!', 'success')
+    return redirect('/')
 
 
 @app.route('/register')
@@ -235,4 +306,4 @@ def load_user(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='localhost', port=5000, debug=True)
