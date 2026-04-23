@@ -1,7 +1,6 @@
 from datetime import datetime
 from eduroomapp import dao
-from eduroomapp.models import BookingStatus, Booking
-from eduroomapp.test.test_base import sample_rooms, test_app, test_session, sample_bookings
+from eduroomapp.test.test_base import sample_rooms, test_app, test_session, sample_bookings, sample_users
 from eduroomapp.dao import get_rooms
 
 
@@ -24,7 +23,7 @@ def test_get_rooms_capacity(test_app, test_session, sample_rooms):
     assert "A101" not in room_names
 
 
-def test_get_rooms_pagination(test_app, test_session, sample_rooms):
+def test_get_rooms_pagination(test_app, test_session, sample_rooms, sample_bookings, sample_users):
     start = datetime(2026, 4, 20, 9, 0)
     end = datetime(2026, 4, 20, 17, 0)
 
@@ -41,7 +40,7 @@ def test_get_rooms_pagination(test_app, test_session, sample_rooms):
         assert name not in names_p2
 
 
-def test_get_rooms_is_booked_status(test_app, test_session, sample_rooms):
+def test_get_rooms_is_booked_status(test_app, test_session, sample_rooms, sample_bookings):
     start_search = datetime(2026, 4, 20, 10, 0)
     end_search = datetime(2026, 4, 20, 12, 0)
 
@@ -54,7 +53,7 @@ def test_get_rooms_is_booked_status(test_app, test_session, sample_rooms):
             assert is_booked is False
 
 
-def test_get_rooms_boundary_time(test_app, test_session, sample_rooms):
+def test_get_rooms_boundary_time(test_app, test_session, sample_rooms, sample_bookings):
     start_search = datetime(2026, 4, 20, 11, 0)
     end_search = datetime(2026, 4, 20, 13, 0)
 
