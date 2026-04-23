@@ -1,8 +1,12 @@
 from datetime import datetime
+from os import name
+
 import pytest
 from flask import Flask
+from pygments.lexers import email
+
 from eduroomapp import db
-from eduroomapp.models import RoomStatus, Room, Booking, BookingStatus
+from eduroomapp.models import RoomStatus, Room, Booking, BookingStatus, User, UserRole
 
 
 def create_app():
@@ -58,6 +62,7 @@ def sample_bookings(test_session, sample_rooms):
 
     b1 = Booking(
         room_id=r1.id,
+        user_id=1,
         start_time=datetime(2026, 4, 20, 9, 0),
         end_time=datetime(2026, 4, 20, 11, 0),
         status=BookingStatus.CONFIRMED
@@ -65,6 +70,7 @@ def sample_bookings(test_session, sample_rooms):
 
     b2 = Booking(
         room_id=r2.id,
+        user_id=1,
         start_time=datetime(2026, 4, 20, 9, 0),
         end_time=datetime(2026, 4, 20, 11, 0),
         status=BookingStatus.CANCELED
@@ -72,6 +78,7 @@ def sample_bookings(test_session, sample_rooms):
 
     b3 = Booking(
         room_id=r3.id,
+        user_id=2,
         start_time=datetime(2026, 4, 20, 15, 0),
         end_time=datetime(2026, 4, 20, 17, 0),
         status=BookingStatus.CONFIRMED
