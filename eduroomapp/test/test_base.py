@@ -1,35 +1,25 @@
 from datetime import datetime
-from os import name
-
 import pytest
-from flask import Flask
-from pygments.lexers import email
-
-from eduroomapp import db
+from eduroomapp import db, app as main_app
 from eduroomapp.models import RoomStatus, Room, Booking, BookingStatus, User, UserRole
-
-
-def create_app():
-    app = Flask(__name__)
-    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
-    app.config["PAGE_SIZE"] = 2
-    app.config["TESTING"] = True
-    app.secret_key = '&(^&*^&*^U*HJBJKHJLHKJHK&*%^&5786985646858'
-    db.init_app(app)
-
-    from eduroomapp.index import register_root
-    register_root(app=app)
-
-    return app
+from eduroomapp.index import register_root
 
 
 @pytest.fixture
 def test_app():
-    app = create_app()
+    main_app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    main_app.config["PAGE_SIZE"] = 2
+    main_app.config["TESTING"] = True
+    main_app.secret_key = '&(^&*^&*^U*HJBJKHJLHKJHK&*%^&5786985646858'
 
-    with app.app_context():
+    if 'home' not in main_app.view_functions:
+        register_root(app=main_app)
+
+    with main_app.app_context():
         db.create_all()
-        yield app
+        yield main_app
+
+        db.session.remove()
         db.drop_all()
 
 
