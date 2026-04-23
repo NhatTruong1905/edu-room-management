@@ -47,12 +47,25 @@ def sample_rooms(test_session):
 
 
 @pytest.fixture
-def sample_bookings(test_session, sample_rooms):
+def sample_users(test_session):
+    u1 = User(fullname="Nguyen Dinh Nhat Truong", username="gv2", password="123", email="u1@gmail.com",
+              user_role=UserRole.TEACHER)
+    u2 = User(fullname="Nguyen Van Tuan", username="user2", password="123", email="u2@gmail.com",
+              user_role=UserRole.STUDENT)
+
+    test_session.add_all([u1, u2])
+    test_session.commit()
+    return [u1, u2]
+
+
+@pytest.fixture
+def sample_bookings(test_session, sample_rooms, sample_users):
     r1, r2, r3, r4 = sample_rooms
+    u1, u2 = sample_users
 
     b1 = Booking(
         room_id=r1.id,
-        user_id=1,
+        user_id=u1.id,
         start_time=datetime(2026, 4, 20, 9, 0),
         end_time=datetime(2026, 4, 20, 11, 0),
         status=BookingStatus.CONFIRMED
@@ -60,7 +73,7 @@ def sample_bookings(test_session, sample_rooms):
 
     b2 = Booking(
         room_id=r2.id,
-        user_id=1,
+        user_id=u1.id,
         start_time=datetime(2026, 4, 20, 9, 0),
         end_time=datetime(2026, 4, 20, 11, 0),
         status=BookingStatus.CANCELED
@@ -68,7 +81,7 @@ def sample_bookings(test_session, sample_rooms):
 
     b3 = Booking(
         room_id=r3.id,
-        user_id=2,
+        user_id=u2.id,
         start_time=datetime(2026, 4, 20, 15, 0),
         end_time=datetime(2026, 4, 20, 17, 0),
         status=BookingStatus.CONFIRMED
