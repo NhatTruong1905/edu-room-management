@@ -199,7 +199,7 @@ def get_cancel_count_week(user_id, start_week, end_week):
     return count
 
 
-def cancel_booking_logic(booking_id, user_id):
+def cancel_booking(booking_id, user_id):
     booking = db.session.query(Booking).filter(
         Booking.id == booking_id,
         Booking.user_id == user_id

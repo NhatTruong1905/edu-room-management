@@ -278,7 +278,7 @@ def register_root(app):
     @permission(allow={"roles": [UserRole.STUDENT, UserRole.TEACHER], "access": True})
     def api_cancel_booking(id):
         try:
-            dao.cancel_booking_logic(booking_id=id, user_id=current_user.id)
+            dao.cancel_booking(booking_id=id, user_id=current_user.id)
             return jsonify({"success": True, "message": "Hủy phòng thành công!"}), 200
         except Exception as ex:
             return jsonify({"success": False, "message": str(ex)}), 400
