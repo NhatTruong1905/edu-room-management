@@ -1,5 +1,4 @@
 import hashlib
-import random
 import re
 import secrets
 from datetime import datetime, timedelta
@@ -35,6 +34,29 @@ def auth_user(username, password):
 
 
 def add_user(fullname, username, password, user_role, email):
+    fullname = fullname.strip()
+    username = username.strip()
+    password = password.strip()
+    email = email.strip()
+
+    if len(fullname) < 5:
+        raise ValueError("Fullname tối thiểu 5 ký tự")
+
+    if len(username) < 4:
+        raise ValueError("Username tối thiểu 4 ký tự")
+
+    if len(password) < 3:
+        raise ValueError("Password tối thiểu 3 ký tự")
+
+    if not re.search(r'[a-z]', username):
+        raise ValueError("Username phải có ký tự chữ")
+
+    if not re.search(r'[0-9]', username):
+        raise ValueError("Username phải có ký tự số")
+
+    if not re.search(r'(@gmail\.com|@.*\.edu\.vn)$', email):
+        raise ValueError("Email phải có đuôi @gmail.com hoặc định dạng @tên_trường.edu.vn")
+
     if User.query.filter(User.username == username).first():
         raise ValueError("Username đã tồn tại")
 
@@ -42,11 +64,11 @@ def add_user(fullname, username, password, user_role, email):
         raise ValueError("Địa chỉ Email này đã được đăng ký!")
 
     password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    u = User(fullname=fullname.strip(),
-             username=username.strip(),
+    u = User(fullname=fullname,
+             username=username,
              password=password,
              user_role=user_role,
-             email=email.strip())
+             email=email)
     db.session.add(u)
     try:
         db.session.commit()
@@ -123,7 +145,7 @@ def get_rooms():
 def get_rooms_by_date_and_time(start_time, end_time, capacity=None, page=1):
     if start_time >= end_time:
         raise ValueError("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!")
-    
+
     booked_subquery = db.session.query(Booking.room_id).filter(
         Booking.start_time < end_time,
         Booking.end_time > start_time,
