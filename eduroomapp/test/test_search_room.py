@@ -40,6 +40,20 @@ def test_get_rooms_pagination(test_app, test_session, sample_rooms, sample_booki
         assert name not in names_p2
 
 
+def test_get_rooms_capacity_pagination(test_app, test_session, sample_rooms, sample_bookings, sample_users):
+    start = datetime(2026, 4, 20, 9, 0)
+    end = datetime(2026, 4, 20, 17, 0)
+
+    rooms_page1, count = dao.get_rooms_by_date_and_time(start, end, capacity=100, page=1)
+    assert len(rooms_page1) == 1
+    assert count == 1
+
+    rooms_page2, count2 = dao.get_rooms_by_date_and_time(start, end, capacity=100, page=2)
+    assert len(rooms_page2) == 0
+    assert count2 == 0
+
+
+
 def test_get_rooms_is_booked_status(test_app, test_session, sample_rooms, sample_bookings):
     start_search = datetime(2026, 4, 20, 10, 0)
     end_search = datetime(2026, 4, 20, 12, 0)
