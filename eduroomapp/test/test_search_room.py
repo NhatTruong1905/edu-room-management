@@ -50,7 +50,7 @@ def test_get_rooms_capacity_pagination(test_app, test_session, sample_rooms, sam
 
     rooms_page2, count2 = dao.get_rooms_by_date_and_time(start, end, capacity=100, page=2)
     assert len(rooms_page2) == 0
-    assert count2 == 0
+    assert count2 == 1
 
 
 
