@@ -1,4 +1,7 @@
 from datetime import datetime
+
+import pytest
+
 from eduroomapp import dao
 from eduroomapp.test.test_base import sample_rooms, test_app, test_session, sample_bookings, sample_users
 from eduroomapp.dao import get_rooms
@@ -53,7 +56,6 @@ def test_get_rooms_capacity_pagination(test_app, test_session, sample_rooms, sam
     assert count2 == 1
 
 
-
 def test_get_rooms_is_booked_status(test_app, test_session, sample_rooms, sample_bookings):
     start_search = datetime(2026, 4, 20, 10, 0)
     end_search = datetime(2026, 4, 20, 12, 0)
@@ -74,3 +76,51 @@ def test_get_rooms_boundary_time(test_app, test_session, sample_rooms, sample_bo
     rooms, _ = dao.get_rooms_by_date_and_time(start_search, end_search)
     is_booked_a101 = [is_booked for r, is_booked in rooms if r.name == "A101"][0]
     assert is_booked_a101 is False
+
+
+def test_get_rooms_canceled_bookings(test_app, test_session, sample_rooms, sample_bookings, sample_users):
+    start_search = datetime(2026, 4, 20, 10, 0)
+    end_search = datetime(2026, 4, 20, 12, 0)
+
+    rooms, _ = dao.get_rooms_by_date_and_time(start_search, end_search)
+
+    is_booked_a102 = [is_booked for r, is_booked in rooms if r.name == "A102"][0]
+    assert is_booked_a102 is False
+
+
+def test_get_rooms_capacity_invalid_format(test_app, test_session, sample_rooms):
+    start = datetime(2026, 4, 20, 14, 0)
+    end = datetime(2026, 4, 20, 15, 0)
+
+    rooms, count = dao.get_rooms_by_date_and_time(start, end, capacity="mười hai")
+
+    assert len(rooms) == 2
+    assert count == 4
+
+
+def test_get_rooms_pagination_out_of_bounds(test_app, test_session, sample_rooms):
+    start = datetime(2026, 4, 20, 9, 0)
+    end = datetime(2026, 4, 20, 17, 0)
+
+    rooms_page99, count = dao.get_rooms_by_date_and_time(start, end, page=99)
+    assert len(rooms_page99) == 0
+    assert count == 4
+
+
+def test_get_rooms_period_of_time_coverage(test_app, test_session, sample_rooms, sample_bookings, sample_users):
+    start_search = datetime(2026, 4, 20, 14, 0)
+    end_search = datetime(2026, 4, 20, 18, 0)
+
+    rooms, _ = dao.get_rooms_by_date_and_time(start_search, end_search, page=2)
+    is_booked_a103 = [is_booked for r, is_booked in rooms if r.name == "A103"][0]
+    assert is_booked_a103 is True
+
+
+def test_get_rooms_time_logic_error(test_app, test_session, sample_rooms):
+    start = datetime(2026, 4, 20, 15, 0)
+    end = datetime(2026, 4, 20, 14, 0)
+
+    with pytest.raises(ValueError) as error:
+        dao.get_rooms_by_date_and_time(start, end)
+
+    assert "Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc" in str(error.value)
