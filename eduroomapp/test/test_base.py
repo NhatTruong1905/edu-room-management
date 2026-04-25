@@ -14,7 +14,10 @@ def test_app():
 
     if 'home' not in main_app.view_functions:
         register_root(app=main_app)
+    if "sqlalchemy" in main_app.extensions:
+        del main_app.extensions["sqlalchemy"]
 
+    db.init_app(main_app)
     with main_app.app_context():
         db.create_all()
         yield main_app
@@ -48,7 +51,7 @@ def sample_rooms(test_session):
 
 @pytest.fixture
 def sample_users(test_session):
-    u1 = User(fullname="Nguyen Dinh Nhat Truong", username="gv2", password="123", email="u1@gmail.com",
+    u1 = User(fullname="Nguyen Dinh Nhat Truong", username="gv02", password="123", email="u1@gmail.com",
               user_role=UserRole.TEACHER)
     u2 = User(fullname="Nguyen Van Tuan", username="user2", password="123", email="u2@gmail.com",
               user_role=UserRole.STUDENT)
@@ -90,3 +93,4 @@ def sample_bookings(test_session, sample_rooms, sample_users):
     test_session.add_all([b1, b2, b3])
     test_session.commit()
     return [b1, b2, b3]
+
