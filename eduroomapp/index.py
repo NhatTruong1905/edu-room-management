@@ -197,8 +197,10 @@ def register_root(app):
                 "current_page": page,
                 "total_count": total_count
             }), 200
-        except ValueError:
-            return jsonify({"error": "Định dạng ngày giờ không hợp lệ!"}), 400
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 400
+        except Exception:
+            return jsonify({"error": "Đã xảy ra lỗi hệ thống!"}), 400
 
     @app.route('/api/bookings', methods=['POST'])
     @login_required
