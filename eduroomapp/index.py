@@ -128,6 +128,8 @@ def register_root(app):
 
             flash('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success')
             return redirect('/login')
+        except ValueError as ex:
+            return render_template('register.html', err_msg=str(ex), roles=roles)
         except Exception as ex:
             return render_template('register.html', err_msg=str(ex), roles=roles)
 
