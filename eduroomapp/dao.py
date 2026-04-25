@@ -121,6 +121,9 @@ def get_rooms():
 
 
 def get_rooms_by_date_and_time(start_time, end_time, capacity=None, page=1):
+    if start_time >= end_time:
+        raise ValueError("Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!")
+    
     booked_subquery = db.session.query(Booking.room_id).filter(
         Booking.start_time < end_time,
         Booking.end_time > start_time,
