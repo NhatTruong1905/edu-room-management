@@ -1,15 +1,18 @@
 from flask import Flask, url_for
+from flask_admin import Admin
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
 from dotenv import load_dotenv
 from authlib.integrations.flask_client import OAuth
 
-basedir = os.path.abspath(os.path.dirname(__file__))
-dotenv_path = os.path.join(basedir, '.env')
-load_dotenv(dotenv_path)
 
-app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
+# dotenv_path = os.path.join(basedir, '.env')
+# load_dotenv(dotenv_path)
+load_dotenv()
+
+app = Flask(__name__, template_folder=os.path.join(basedir, 'templates'))
 app.secret_key = os.environ.get('SECRET_KEY')
 app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URI')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
@@ -36,3 +39,6 @@ facebook = oauth.register(
     api_base_url='https://graph.facebook.com/',
     client_kwargs={'scope': 'email public_profile'},
 )
+
+admin = Admin(app, name="Quản trị đặt phòng")
+import eduroomapp.admin

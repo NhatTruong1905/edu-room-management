@@ -1,0 +1,12 @@
+{% extends 'admin/master.html' %}
+
+{% block body %}
+<h3>Thêm Tài khoản từ file</h3>
+
+<form method="post" enctype="multipart/form-data">
+    <input type="file" name="file" required>
+    </br></br>
+    <button type="submit">Thêm</button>
+</form>
+
+{% endblock %}
