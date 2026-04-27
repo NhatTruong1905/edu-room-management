@@ -12,10 +12,14 @@ load_dotenv(dotenv_path)
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY')
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get('DATABASE_URI')
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = True
 app.config["PAGE_SIZE"] = 6
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
+
+database_uri = os.environ.get('DATABASE_URI')
+if database_uri and database_uri.startswith("postgres://"):
+    database_uri = database_uri.replace("postgres://", "postgresql://", 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 
 db = SQLAlchemy(app=app)
 login = LoginManager(app=app)
