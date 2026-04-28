@@ -244,9 +244,10 @@ def cancel_booking(booking_id, user_id):
     end_week = start_week + timedelta(days=6)
     cancel_count = get_cancel_count_week(user_id, start_week, end_week)
 
-    if cancel_count >= 5:
+    if cancel_count > 5:
         user = db.session.query(User).get(user_id)
         user.locked_until = now + timedelta(hours=24)
+        raise Exception("Không được phép hủy thêm!! Đã vượt quá giới hạn tuần này!")
 
     try:
         db.session.commit()
