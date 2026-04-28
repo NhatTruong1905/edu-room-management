@@ -221,8 +221,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 )
-;
+document.addEventListener('DOMContentLoaded', function () {
+    const btnReloadBookings = document.getElementById('btn-reload-bookings');
 
+    if (btnReloadBookings) {
+        btnReloadBookings.addEventListener('click', function () {
+            const icon = this.querySelector('i');
+            icon.classList.add('fa-spin');
+            loadUserBookings();
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+            }, 1000);
+        });
+    }
+});
 window.loadUserBookings = function () {
     const tbody = document.getElementById('user-bookings-list');
     if (!tbody) return;
@@ -230,7 +242,7 @@ window.loadUserBookings = function () {
         tbody.innerHTML = '';
 
         if (!data.bookings || data.bookings.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Bạn chưa có lịch đặt phòng nào.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Bạn chưa có lịch đặt phòng nào.</td></tr>';
             return;
         }
 
@@ -253,8 +265,11 @@ window.loadUserBookings = function () {
             }
 
             tbody.innerHTML += `
-                        <tr>
-                            <td class="ps-4 py-3 fw-semibold text-dark">${b.name_room} <br>
+                        <tr class="booking-row">
+                            <td class="ps-4">
+                                <input class="form-check-input row-checkbox" type="checkbox" value="${b.id}">
+                            </td>
+                            <td class="py-3 fw-semibold text-dark">${b.name_room} <br>
                                 <span class="text-muted small fw-normal">${b.capacity} chỗ</span>
                             </td>
                             <td class="py-3">${b.date}<br>
@@ -265,11 +280,68 @@ window.loadUserBookings = function () {
                         </tr>
                     `;
         });
+        const checkAllBtn = document.getElementById('check-all-bookings');
+        const hideBtn = document.getElementById('btn-hide-selected');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+
+        if (checkAllBtn) checkAllBtn.checked = false;
+        if (hideBtn) hideBtn.classList.add('d-none');
+
+        function toggleHideButton() {
+            const anyChecked = document.querySelector('.row-checkbox:checked');
+            if (anyChecked) {
+                hideBtn.classList.remove('d-none');
+            } else {
+                hideBtn.classList.add('d-none');
+            }
+        }
+
+        if (checkAllBtn) {
+            checkAllBtn.addEventListener('change', function () {
+                rowCheckboxes.forEach(cb => cb.checked = this.checked);
+                toggleHideButton();
+            });
+        }
+
+        rowCheckboxes.forEach(cb => {
+            cb.addEventListener('change', function () {
+                toggleHideButton();
+                if (!this.checked) checkAllBtn.checked = false;
+            });
+        });
+
+        if (hideBtn) {
+            hideBtn.onclick = function () {
+                document.querySelectorAll('.row-checkbox:checked').forEach(cb => {
+                    cb.closest('tr').remove();
+                });
+                this.classList.add('d-none');
+                checkAllBtn.checked = false;
+
+                if (document.querySelectorAll('.booking-row').length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-4">Đã ẩn toàn bộ danh sách hiển thị. Tải lại trang để xem lại.</td></tr>';
+                }
+            };
+        }
+
     }).catch(err => {
         console.error("Lỗi khi tải lịch đặt phòng:", err);
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger py-4">Lỗi kết nối máy chủ!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Lỗi kết nối máy chủ!</td></tr>';
     });
 }
+document.addEventListener('DOMContentLoaded', function () {
+    const collapseEl = document.getElementById('bookingTableCollapse');
+    const toggleIcon = document.getElementById('toggle-icon');
+
+    if (collapseEl && toggleIcon) {
+        collapseEl.addEventListener('show.bs.collapse', function () {
+            toggleIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+        });
+        collapseEl.addEventListener('hide.bs.collapse', function () {
+            toggleIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+        });
+    }
+});
 
 window.cancelBooking = function (id) {
     if (!confirm("Bạn có chắc chắn muốn hủy lịch đặt phòng này không?")) {
