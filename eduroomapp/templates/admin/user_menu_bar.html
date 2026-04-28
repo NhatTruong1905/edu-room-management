@@ -1,0 +1,6 @@
+{% extends 'admin/model/list.html' %}
+
+{% block model_menu_bar %}
+    {{ super() }}
+    <a href="/admin/user/import-csv" class="btn btn-primary">Thêm từ file</a>
+{% endblock %}

@@ -102,36 +102,36 @@ def register_root(app):
         flash(f'Xin chào {user.fullname}, bạn đã đăng nhập thành công!', 'success')
         return redirect('/')
 
-    @app.route('/register')
-    def register_view():
-        roles = dao.get_user_role()
-        return render_template('register.html', roles=roles)
-
-    @app.route('/register', methods=['post'])
-    def register_process():
-        roles = dao.get_user_role()
-        data = request.form
-
-        password = data.get('password')
-        confirm = data.get('confirm_password')
-        email = data.get('email')
-        if password != confirm:
-            err_msg = 'Xác nhận mật khẩu không khớp!'
-            return render_template('register.html', err_msg=err_msg, roles=roles)
-
-        try:
-            add_user(fullname=data.get('fullname'),
-                     username=data.get('username'),
-                     password=password,
-                     user_role=data.get('role'),
-                     email=email)
-
-            flash('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success')
-            return redirect('/login')
-        except ValueError as ex:
-            return render_template('register.html', err_msg=str(ex), roles=roles)
-        except Exception as ex:
-            return render_template('register.html', err_msg=str(ex), roles=roles)
+    # @app.route('/register')
+    # def register_view():
+    #     roles = dao.get_user_role()
+    #     return render_template('register.html', roles=roles)
+    #
+    # @app.route('/register', methods=['post'])
+    # def register_process():
+    #     roles = dao.get_user_role()
+    #     data = request.form
+    #
+    #     password = data.get('password')
+    #     confirm = data.get('confirm_password')
+    #     email = data.get('email')
+    #     if password != confirm:
+    #         err_msg = 'Xác nhận mật khẩu không khớp!'
+    #         return render_template('register.html', err_msg=err_msg, roles=roles)
+    #
+    #     try:
+    #         add_user(fullname=data.get('fullname'),
+    #                  username=data.get('username'),
+    #                  password=password,
+    #                  user_role=data.get('role'),
+    #                  email=email)
+    #
+    #         flash('Đăng ký tài khoản thành công! Vui lòng đăng nhập.', 'success')
+    #         return redirect('/login')
+    #     except ValueError as ex:
+    #         return render_template('register.html', err_msg=str(ex), roles=roles)
+    #     except Exception as ex:
+    #         return render_template('register.html', err_msg=str(ex), roles=roles)
 
     @app.route('/logout')
     def logout_process():
