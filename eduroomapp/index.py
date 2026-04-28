@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, date, timedelta
-
+import os
 from flask import render_template, request, redirect, flash, jsonify, url_for
 from eduroomapp import app, dao, google, db, facebook
 from flask_login import login_user, logout_user, login_required, current_user
@@ -300,4 +300,5 @@ def load_user(id):
 
 if __name__ == '__main__':
     register_root(app=app)
+    port = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=5000, debug=True)
