@@ -11,6 +11,7 @@ from flask_login import current_user
 from eduroomapp.models import UserRole, Room, User, Booking, BookingStatus
 from eduroomapp import admin, db
 
+
 class AuthenticatedAdmin(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated and current_user.user_role == UserRole.ADMIN
@@ -43,6 +44,7 @@ class RoomView(AuthenticatedAdmin, BaseModelAdminView):
             return False
 
         return super().delete_model(model)
+
 
 class UserView(AuthenticatedAdmin, BaseModelAdminView):
     list_template = 'admin/user_menu_bar.html'
