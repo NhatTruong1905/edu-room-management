@@ -85,12 +85,19 @@ def sample_bookings(test_session, sample_rooms, sample_users):
     b3 = Booking(
         room_id=r3.id,
         user_id=u2.id,
-        start_time=datetime(2026, 4, 20, 15, 0),
+        start_time=datetime(2026, 4, 20, 12, 10),
         end_time=datetime(2026, 4, 20, 17, 0),
         status=BookingStatus.CONFIRMED
     )
 
-    test_session.add_all([b1, b2, b3])
-    test_session.commit()
-    return [b1, b2, b3]
+    b4 = Booking(
+        room_id=r4.id,
+        user_id=u2.id,
+        start_time=datetime(2026, 5, 20, 15, 0),
+        end_time=datetime(2026, 5, 20, 17, 0),
+        status=BookingStatus.CONFIRMED
+    )
 
+    test_session.add_all([b1, b2, b3, b4])
+    test_session.commit()
+    return [b1, b2, b3, b4]
