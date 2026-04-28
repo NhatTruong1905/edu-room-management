@@ -247,10 +247,12 @@ def cancel_booking(booking_id, user_id):
     if cancel_count > 5:
         user = db.session.query(User).get(user_id)
         user.locked_until = now + timedelta(hours=24)
-        raise Exception("Không được phép hủy thêm!! Đã vượt quá giới hạn tuần này!")
 
     try:
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Lỗi hệ thống: {e}")
+
+    if cancel_count > 5:
+        raise Exception("Không được phép hủy thêm! Tài khoản của bạn bị khóa 24h vì vượt quá giới hạn hủy tuần này!")
