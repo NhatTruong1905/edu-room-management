@@ -267,3 +267,7 @@ def cancel_booking(booking_id, user_id):
 
     if cancel_count > 5:
         raise Exception("Không được phép hủy thêm! Tài khoản của bạn bị khóa 24h vì vượt quá giới hạn hủy tuần này!")
+
+
+def get_booking_of_user(user_id, room_id):
+    return db.session.query(Booking).filter(Booking.room_id == room_id, Booking.user_id == user_id).first()
