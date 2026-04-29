@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.functions import func
 from flask_login import UserMixin
+
 from eduroomapp import db, app
 from sqlalchemy import Column, String, Integer, Boolean, Enum, DateTime, ForeignKey
 
@@ -21,6 +22,7 @@ class RoomStatus(enum.Enum):
 
 class Room(BaseModel):
     __tablename__ = 'room'
+    __table_args__ = {'extend_existing': True}
     name = Column(String(50), nullable=False, unique=True)
     capacity = Column(Integer, nullable=False)
     status = Column(Enum(RoomStatus), default=RoomStatus.AVAILABLE, nullable=False)
@@ -36,7 +38,7 @@ class UserRole(enum.Enum):
 
 class User(BaseModel, UserMixin):
     __tablename__ = 'user'
-
+    __table_args__ = {'extend_existing': True}
     fullname = Column(String(100), nullable=False)
     email = Column(String(100), unique=True, nullable=True)
     username = Column(String(100), nullable=False, unique=True)
@@ -54,7 +56,7 @@ class BookingStatus(enum.Enum):
 
 class Booking(BaseModel):
     __tablename__ = 'booking'
-
+    __table_args__ = {'extend_existing': True}
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
     status = Column(Enum(BookingStatus), default=BookingStatus.CONFIRMED, nullable=False)
@@ -69,32 +71,47 @@ class Booking(BaseModel):
 
 
 def add_data():
-    admin = User(fullname="Nguyễn Quản Trị", username="admin", password="202cb962ac59075b964b07152d234b70",
+    admin = User(fullname="Nguyễn Quản Trị", username="admin1",
+                 password="$2a$12$wV/sS6FXhLkHizb9eE53XOd78yFywL8hwO.LhuMPylOFn69RZ/NdK",
                  user_role=UserRole.ADMIN)
-
-    gv1 = User(fullname="Trần Tiến Sĩ", username="gv01", password="202cb962ac59075b964b07152d234b70",
-               user_role=UserRole.TEACHER)
-    gv2 = User(fullname="Lê Thạc Sĩ", username="gv02", password="202cb962ac59075b964b07152d234b70",
-               user_role=UserRole.TEACHER)
-
-    sv1 = User(fullname="Phạm Học Bá", username="sv01", password="202cb962ac59075b964b07152d234b70",
-               user_role=UserRole.STUDENT)
-    sv2 = User(fullname="Hoàng Chăm Chỉ", username="sv02", password="202cb962ac59075b964b07152d234b70",
-               user_role=UserRole.STUDENT)
-    sv3_locked = User(fullname="Spam Hủy", username="sv03", password="202cb962ac59075b964b07152d234b70",
-                      user_role=UserRole.STUDENT,
-                      locked_until=datetime.now() + timedelta(hours=20))
-
-    db.session.add_all([admin, gv1, gv2, sv1, sv2, sv3_locked])
+    gv1 = User(fullname="Trần Tiến Sĩ", username="gv01",
+               password="$2a$12$9pRZbqk9J5Yz80zNRHEP6eYumL4CiKvdnFEhXCreZG0JrbYSvSF4K",
+               user_role=UserRole.TEACHER, email="t1@gmail.com")
+    gv2 = User(fullname="Lê Thạc Sĩ", username="gv02",
+               password="$2a$12$Fvc8rkfUYlvHnZ99fN9yLeopgH9csqbLAsU3G6U5u0Ro3V0In53tO",
+               user_role=UserRole.TEACHER, email="t2@gmail.com")
+    sv1 = User(fullname="Phạm Học Bá", username="sv01",
+               password="$2a$12$ZszMfBOtxilJqluWAz776eCKWCtUc6ww5P2hhq6ZhTSwANSUwIaUy",
+               user_role=UserRole.STUDENT, email="t3@gmail.com")
+    sv2 = User(fullname="Hoàng Chăm Chỉ", username="sv02",
+               password="$2a$12$ivVCJGUaa/2w2hPUh3loeejQ0KapOS7LQaDSOhDslylN1N8UjkFFm",
+               user_role=UserRole.STUDENT, email="t4@gmail.com")
+    s3 = User(fullname="Phùng Thanhh Độ", username="sv03",
+              password="$2a$12$hwYcOJp4YeJP7ffRmOvjVux5mk6ZegrijGcun1HBEWJnC5dwgixEm",
+              user_role=UserRole.TEACHER, email="t5@gmail.com")
+    s4 = User(fullname="Phạm Văn Tày", username="sv04",
+              password="$2a$12$Z6vEZCIMsZyQRlnznVNqhOE6cKGoC.mxk8d4l/xTB7aJH2UL4/q1i",
+              user_role=UserRole.STUDENT, email="t6@gmail.com")
+    db.session.add_all([admin, gv1, gv2, sv1, sv2, s3, s4])
     db.session.commit()
 
     r1 = Room(name="A101", capacity=50, status=RoomStatus.AVAILABLE)
     r2 = Room(name="A102", capacity=30, status=RoomStatus.AVAILABLE)
     r3 = Room(name="B201", capacity=100, status=RoomStatus.AVAILABLE)
     r4 = Room(name="C305", capacity=200, status=RoomStatus.AVAILABLE)
-    r5_maintenance = Room(name="D404", capacity=40, status=RoomStatus.MAINTENANCE)
+    r5 = Room(name="D404", capacity=40, status=RoomStatus.MAINTENANCE)
+    r6 = Room(name="E501", capacity=45, status=RoomStatus.AVAILABLE)
+    r7 = Room(name="Lap 01", capacity=30, status=RoomStatus.AVAILABLE)
+    r8 = Room(name="Lap 02", capacity=30, status=RoomStatus.MAINTENANCE)
+    r9 = Room(name="Hall A", capacity=500, status=RoomStatus.AVAILABLE)
+    r10 = Room(name="Meeting Room 1", capacity=10, status=RoomStatus.AVAILABLE)
+    r11 = Room(name="Library Quiet Room", capacity=15, status=RoomStatus.AVAILABLE)
+    r12 = Room(name="Workshop B", capacity=60, status=RoomStatus.AVAILABLE)
+    r13 = Room(name="E502", capacity=45, status=RoomStatus.AVAILABLE)
+    r14 = Room(name="Studio 1", capacity=20, status=RoomStatus.AVAILABLE)
+    r15 = Room(name="A202", capacity=40, status=RoomStatus.AVAILABLE)
 
-    db.session.add_all([r1, r2, r3, r4, r5_maintenance])
+    db.session.add_all([r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r13, r14, r15])
     db.session.commit()
 
     now = datetime.now()
@@ -132,9 +149,3 @@ def add_data():
 
     db.session.add_all([b1, b2, b3, b4])
     db.session.commit()
-
-
-if __name__ == '__main__':
-    with app.app_context():
-        # db.create_all()
-        add_data()

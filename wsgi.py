@@ -9,6 +9,7 @@ with app.app_context():
 
     from eduroomapp.models import User
 
+    db.drop_all()
     if not User.query.filter_by(username='admin').first():
         add_data()
 

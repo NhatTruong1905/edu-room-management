@@ -2,7 +2,7 @@ from datetime import datetime
 
 import pandas as pd
 import hashlib
-
+import bcrypt
 from flask import request, redirect, url_for, flash
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
@@ -65,7 +65,9 @@ class UserView(AuthenticatedAdmin, BaseModelAdminView):
 
     def on_model_change(self, form, model, is_created):
         if model.password:
-            model.password = str(hashlib.md5(model.password.strip().encode('utf-8')).hexdigest())
+            byte_password = model.password.encode('utf-8')
+            hash_password = bcrypt.hashpw(byte_password, bcrypt.gensalt(12))
+            model.password = hash_password.decode('utf-8')
 
     @expose('/import-csv', methods=['POST'])
     def import_csv(self):
@@ -78,11 +80,14 @@ class UserView(AuthenticatedAdmin, BaseModelAdminView):
         for _, row in df.iterrows():
             username = str(row['username']).strip()
             cccd = str(row['cccd']).strip()
+            byte_password = cccd.encode('utf-8')
+            hash_password = bcrypt.hashpw(byte_password, bcrypt.gensalt(12))
+            password = hash_password.decode('utf-8')
             user = User(
                 fullname=str(row['fullname']).strip(),
                 username=username,
                 email=str(row['email']).strip() if pd.notna(row['email']) else None,
-                password=str(hashlib.md5(cccd.encode('utf-8')).hexdigest()),
+                password=password,
                 user_role=UserRole[str(row['user_role']).strip()]
             )
             db.session.add(user)
