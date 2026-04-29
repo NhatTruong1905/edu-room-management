@@ -5,12 +5,12 @@ from eduroomapp.models import add_data
 register_root(app)
 
 with app.app_context():
+    db.drop_all()
     db.create_all()
 
     from eduroomapp.models import User
 
-    db.drop_all()
-    if not User.query.filter_by(username='admin').first():
+    if not User.query.filter_by(username='admin1').first():
         add_data()
 
 application = app
