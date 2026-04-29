@@ -5,7 +5,6 @@ from eduroomapp.models import add_data
 register_root(app)
 
 with app.app_context():
-    db.drop_all()
     db.create_all()
 
     from eduroomapp.models import User
