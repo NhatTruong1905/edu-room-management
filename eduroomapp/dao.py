@@ -3,6 +3,7 @@ import re
 import secrets
 from datetime import datetime, timedelta
 
+import bcrypt
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 from sqlalchemy.sql.functions import func
@@ -28,9 +29,13 @@ def get_user_by_username(username):
 
 
 def auth_user(username, password):
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
-    return User.query.filter(User.username == username,
-                             User.password == password).first()
+    user = User.query.filter_by(username=username).first()
+    if user:
+        input_password_bytes = password.strip().encode('utf-8')
+        stored_password_bytes = user.password.encode('utf-8')
+        if bcrypt.checkpw(input_password_bytes, stored_password_bytes):
+            return user
+    return None
 
 
 def add_user(fullname, username, password, user_role, email):
@@ -63,7 +68,9 @@ def add_user(fullname, username, password, user_role, email):
     if User.query.filter(User.email == email).first():
         raise ValueError("Địa chỉ Email này đã được đăng ký!")
 
-    password = str(hashlib.md5(password.strip().encode('utf-8')).hexdigest())
+    raw_password = password.encode('utf-8')
+    hashed_bytes = bcrypt.hashpw(raw_password, bcrypt.gensalt(12))
+    password = hashed_bytes.decode('utf-8')
     u = User(fullname=fullname,
              username=username,
              password=password,
@@ -87,7 +94,9 @@ def create_user_from_google(google_email, google_name):
         count += 1
 
     random_password = secrets.token_hex(8)
-    hashed_password = str(hashlib.md5(random_password.encode('utf-8')).hexdigest())
+    byte_password = random_password.strip().encode('utf-8')
+    hashed_bytes = bcrypt.hashpw(byte_password, bcrypt.gensalt(12))
+    hashed_password = hashed_bytes.decode('utf-8')
 
     user = User(
         fullname=google_name,
@@ -119,7 +128,9 @@ def create_user_from_facebook(fb_id, fb_name, fb_email):
         count += 1
 
     random_password = secrets.token_hex(8)
-    hashed_password = str(hashlib.md5(random_password.encode('utf-8')).hexdigest())
+    byte_password = random_password.strip().encode('utf-8')
+    hashed_bytes = bcrypt.hashpw(byte_password, bcrypt.gensalt(12))
+    hashed_password = hashed_bytes.decode('utf-8')
 
     user = User(
         fullname=fb_name,
