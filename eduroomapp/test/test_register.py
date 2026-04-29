@@ -1,4 +1,6 @@
 import hashlib
+
+import bcrypt
 import pytest
 from sqlalchemy.exc import IntegrityError
 from eduroomapp import db
@@ -17,7 +19,7 @@ def test_add_success(test_session, sample_users):
     user = User.query.filter(User.username == 'gv01').first()
     assert user is not None
     assert user.username == 'gv01'
-    assert user.password == str(hashlib.md5("345".encode("utf-8")).hexdigest())
+    assert bcrypt.checkpw("345".encode("utf-8"), user.password.encode("utf-8"))
 
 
 def test_invalid_fullname(test_session):
