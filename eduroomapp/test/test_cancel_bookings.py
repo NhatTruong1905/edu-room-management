@@ -102,7 +102,7 @@ def test_cancel_bookings_lock_account(test_session, sample_rooms, sample_users, 
     mock_get.assert_called_once()
 
 
-def test_cancel_bookings_db_error(test_session, sample_rooms, sample_users, mocker):
+def test_cancel_bookings_failure(test_session, sample_rooms, sample_users, mocker):
     u1, u2 = sample_users
     r1, r2, r3, r4 = sample_rooms
 
