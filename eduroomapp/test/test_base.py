@@ -111,6 +111,7 @@ def auth_client(test_client, mocker):
             self.is_authenticated = True
             self.is_active = True
             self.is_anonymous = False
+            self.user_role = UserRole.TEACHER
 
         def get_id(self):
             return str(self.id)
