@@ -224,6 +224,10 @@ def register_root(app):
             start_dt = datetime.strptime(f"{date_str} {start_str}", "%Y-%m-%d %H:%M")
             end_dt = datetime.strptime(f"{date_str} {end_str}", "%Y-%m-%d %H:%M")
 
+            if start_dt >= end_dt:
+                flash('Lỗi: Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!', 'danger')
+                return redirect('/booking')
+
             booking_date = start_dt.date()
             count_booking_today = dao.get_booking_count_today(user_id=current_user.id, today_date=booking_date)
             if count_booking_today >= 3:
