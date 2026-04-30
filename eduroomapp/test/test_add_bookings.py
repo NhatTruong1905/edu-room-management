@@ -36,3 +36,5 @@ def test_add_bookings_failure(test_session, sample_rooms, sample_users, mocker):
 
     mock_commit.assert_called_once()
     mock_rollback.assert_called_once()
+
+

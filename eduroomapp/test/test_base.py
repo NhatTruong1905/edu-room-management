@@ -14,10 +14,9 @@ def test_app():
 
     if 'home' not in main_app.view_functions:
         register_root(app=main_app)
-    if "sqlalchemy" in main_app.extensions:
-        del main_app.extensions["sqlalchemy"]
+    if "sqlalchemy" not in main_app.extensions:
+        db.init_app(main_app)
 
-    db.init_app(main_app)
     with main_app.app_context():
         db.create_all()
         yield main_app
@@ -101,3 +100,21 @@ def sample_bookings(test_session, sample_rooms, sample_users):
     test_session.add_all([b1, b2, b3, b4])
     test_session.commit()
     return [b1, b2, b3, b4]
+
+
+@pytest.fixture
+def auth_client(test_client, mocker):
+    class FakeUser:
+        def __init__(self):
+            self.id = 1
+            self.locked_until = None
+            self.is_authenticated = True
+            self.is_active = True
+            self.is_anonymous = False
+
+        def get_id(self):
+            return str(self.id)
+
+    fake_user = FakeUser()
+    mocker.patch('flask_login.utils._get_user', return_value=fake_user)
+    return test_client, fake_user
