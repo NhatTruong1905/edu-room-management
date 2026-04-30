@@ -125,3 +125,20 @@ def test_api_create_booking_system_error(auth_client, mocker):
     with test_client.session_transaction() as sess:
         flashes = sess.get('_flashes', [])
         assert ('danger', 'Đặt phòng thất bại. Vui lòng thử lại! \n Lỗi: Database Exception') in flashes
+
+
+def test_api_create_booking_invalid_time(auth_client):
+    test_client, fake_user = auth_client
+
+    form_data = {
+        'room_id': '1',
+        'booking_date': '2026-04-30',
+        'booking_start_time': '11:00',
+        'booking_end_time': '09:00'
+    }
+    res = test_client.post('/api/bookings', data=form_data)
+    assert res.status_code == 302
+
+    with test_client.session_transaction() as session:
+        flashes = session.get('_flashes', [])
+        assert ('danger', 'Lỗi: Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc!') in flashes

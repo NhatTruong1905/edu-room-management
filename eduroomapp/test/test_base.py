@@ -14,10 +14,9 @@ def test_app():
 
     if 'home' not in main_app.view_functions:
         register_root(app=main_app)
-    if "sqlalchemy" in main_app.extensions:
-        del main_app.extensions["sqlalchemy"]
+    if "sqlalchemy" not in main_app.extensions:
+        db.init_app(main_app)
 
-    db.init_app(main_app)
     with main_app.app_context():
         db.create_all()
         yield main_app

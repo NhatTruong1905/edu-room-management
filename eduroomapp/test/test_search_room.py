@@ -116,10 +116,9 @@ def test_get_rooms_period_of_time_coverage(test_app, test_session, sample_rooms,
     assert is_booked_a103 is True
 
 
-def test_get_rooms_time_logic_error(test_app, test_session, sample_rooms):
+def test_get_rooms_invalid_time(test_app, test_session, sample_rooms):
     start = datetime(2026, 4, 20, 15, 0)
     end = datetime(2026, 4, 20, 14, 0)
 
     with pytest.raises(ValueError, match="Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc"):
         dao.get_rooms_by_date_and_time(start, end)
-
