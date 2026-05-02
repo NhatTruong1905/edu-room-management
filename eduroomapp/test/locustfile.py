@@ -1,15 +1,22 @@
 import random
 from locust import HttpUser, task, between
+from locust.exception import StopUser
 
 
 class EduRoomStudent(HttpUser):
     wait_time = between(2, 5)
 
     def on_start(self):
-        self.client.post("/login", data={
-            "username": "gv03",
+        with self.client.post("/login", data={
+            "username": "sv03",
             "password": "123"
-        })
+        }, catch_response=True) as response:
+            if "/login" in response.url or response.status_code == 0:
+                print(f"Cảnh báo: 1 User đăng nhập thất bại (Status: {response.status_code})!")
+                response.failure("Đăng nhập thất bại")
+                raise StopUser()
+            else:
+                response.success()
 
     @task(4)
     def search_rooms(self):
@@ -35,14 +42,10 @@ class EduRoomStudent(HttpUser):
             else:
                 response.failure(f"Lỗi tải Dashboard: {response.status_code}")
 
-    @task(2)
+    @task(3)
     def view_my_history(self):
         with self.client.get("/api/bookings", catch_response=True) as response:
             if response.status_code == 200:
                 response.success()
             else:
                 response.failure(f"Lỗi lịch sử: {response.status_code}")
-
-    @task(1)
-    def view_home_page(self):
-        self.client.get("/")
