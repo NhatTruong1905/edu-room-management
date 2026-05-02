@@ -34,7 +34,7 @@ class EduRoomStudent(HttpUser):
             else:
                 response.failure(f"Lỗi tìm phòng! Status Code: {response.status_code}")
 
-    @task(2)
+    @task(3)
     def view_booking_dashboard(self):
         with self.client.get("/booking", catch_response=True) as response:
             if response.status_code == 200:
@@ -42,7 +42,7 @@ class EduRoomStudent(HttpUser):
             else:
                 response.failure(f"Lỗi tải Dashboard: {response.status_code}")
 
-    @task(3)
+    @task(2)
     def view_my_history(self):
         with self.client.get("/api/bookings", catch_response=True) as response:
             if response.status_code == 200:
