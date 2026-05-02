@@ -305,8 +305,8 @@ def load_user(id):
 # def admin_view():
 #     return render_template("admin.html")
 
-register_root(app=app)
+
 if __name__ == '__main__':
-    # register_root(app=app)
+    register_root(app=app)
     port = int(os.environ.get('PORT', 5000))
     app.run(host='localhost', port=5000, debug=True)
