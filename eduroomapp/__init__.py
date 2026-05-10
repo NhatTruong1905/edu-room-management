@@ -23,6 +23,18 @@ if database_uri and database_uri.startswith("postgres://"):
     database_uri = database_uri.replace("postgres://", "postgresql://", 1)
 app.config["SQLALCHEMY_DATABASE_URI"] = database_uri
 
+engine_options = {
+    'pool_recycle': 1800
+}
+if database_uri and not database_uri.startswith("sqlite"):
+    engine_options.update({
+        'pool_size': 10,
+        'max_overflow': 20,
+        'pool_timeout': 30,
+    })
+
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = engine_options
+
 db = SQLAlchemy(app=app)
 login = LoginManager(app=app)
 oauth = OAuth(app)
