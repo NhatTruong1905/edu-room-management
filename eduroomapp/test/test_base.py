@@ -110,6 +110,7 @@ def sample_admin(test_session):
     test_session.commit()
     return admin
 
+@pytest.fixture
 def auth_client(test_client, mocker):
     class FakeUser:
         def __init__(self):
