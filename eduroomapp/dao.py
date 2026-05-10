@@ -49,6 +49,9 @@ def add_user(fullname, username, password, user_role, email):
     if len(username) < 4:
         raise ValueError("Username tối thiểu 4 ký tự")
 
+    if len(fullname) < 4:
+        raise ValueError("Fullname tối thiểu 4 ký tự")
+
     if len(password) < 3:
         raise ValueError("Password tối thiểu 3 ký tự")
 

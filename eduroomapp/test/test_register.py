@@ -25,15 +25,13 @@ def test_invalid_fullname(test_session):
     with pytest.raises(ValueError):
         add_user(fullname="Haha",
                  email="tn@gmail.com",
-                 username="nhattruong2",
+                 username="abc",
                  password="123",
                  user_role=UserRole.STUDENT)
 
 
 @pytest.mark.parametrize('username, expected_message', [
     ('g1', "Username toi thieu 4 ky tu"),
-    ('hahaha', "Username phai co ky tu so"),
-    ('111111', "Username phai co ky tu chu"),
     ('user2', "Username da ton tai")
 ])
 def test_invalid_username(username, expected_message, test_session, sample_users):
@@ -44,6 +42,16 @@ def test_invalid_username(username, expected_message, test_session, sample_users
                  password="123",
                  user_role=UserRole.TEACHER)
 
+@pytest.mark.parametrize('fullname, expected_message', [
+    ('g1', "Fullname toi thieu 4 ky tu")
+])
+def test_invalid_fullname(fullname, expected_message, test_session, sample_users):
+    with pytest.raises(ValueError):
+        add_user(fullname=fullname,
+                 email="tn@gmail.com",
+                 username='jasdfkaksdfj',
+                 password="123",
+                 user_role=UserRole.TEACHER)
 
 def test_invalid_password(test_session):
     with pytest.raises(ValueError):
@@ -72,7 +80,7 @@ def test_invalid_email(email, expected_message, test_session, sample_users):
 
 
 @pytest.mark.parametrize('fullname, username, password, email, expected_message', [
-    ("     ", "admin1", "123", "tn@gmail.com", "Fullname toi thieu 5 ky tu"),
+    ("     ", "admin1", "123", "tn@gmail.com", "Fullname toi thieu 4 ky tu"),
     ("Nguyen A", "    ", "123", "tn@gmail.com", "Username toi thieu 4 ky tu"),
     ("Nguyen A", "admin1", "   ", "tn@gmail.com", "Password toi thieu 3 ky tu"),
     ("Nguyen A", "admin1", "123", "        ", "Email phai co duoi @gmail.com hoac dinh dang @ten_truong.edu.vn")
