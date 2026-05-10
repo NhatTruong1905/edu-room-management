@@ -60,7 +60,6 @@ def sample_users(test_session):
     test_session.commit()
     return [u1, u2]
 
-
 @pytest.fixture
 def sample_bookings(test_session, sample_rooms, sample_users):
     r1, r2, r3, r4 = sample_rooms
@@ -101,3 +100,13 @@ def sample_bookings(test_session, sample_rooms, sample_users):
     test_session.add_all([b1, b2, b3, b4])
     test_session.commit()
     return [b1, b2, b3, b4]
+
+
+@pytest.fixture
+def sample_admin(test_session):
+    admin = User(fullname="Nguyen Van Tuan", username="admin", password="123", email="admin@gmail.com",
+              user_role=UserRole.ADMIN)
+
+    test_session.add(admin)
+    test_session.commit()
+    return admin

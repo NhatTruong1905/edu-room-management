@@ -9,7 +9,9 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
 
 from eduroomapp.models import UserRole, Room, User, Booking, BookingStatus
-from eduroomapp import admin, db
+from eduroomapp import admin, db, dao
+from eduroomapp.dao import add_user
+from eduroomapp.exceptions import DeleteRoomException, EmptyRoomException
 
 
 class AuthenticatedAdmin(ModelView):
@@ -33,17 +35,19 @@ class RoomView(AuthenticatedAdmin, BaseModelAdminView):
     }
 
     def delete_model(self, model):
-        future_booking = Booking.query.filter(
-            Booking.room_id == model.id,
-            Booking.start_time > datetime.now(),
-            Booking.status == BookingStatus.CONFIRMED
-        ).first()
-
-        if future_booking:
-            flash('Không thể xóa phòng vì đã có lịch đặt trong tương lai!', 'error')
+        try:
+            dao.delete_room(model.id, current_user)
+            flash(f'Đã xoá phòng {model.name} thành công.', 'success')
+            return True
+        except PermissionError as pe:
+            flash(str(pe), 'error')
             return False
-
-        return super().delete_model(model)
+        except EmptyRoomException as e:
+            flash(str(e), 'error')
+            return False
+        except DeleteRoomException as e:
+            flash(str(e), 'error')
+            return False
 
 
 class UserView(AuthenticatedAdmin, BaseModelAdminView):
@@ -72,35 +76,68 @@ class UserView(AuthenticatedAdmin, BaseModelAdminView):
     @expose('/import-csv', methods=['POST'])
     def import_csv(self):
         file = request.files.get('file')
-
         df = pd.read_csv(file)
         df.columns = df.columns.str.strip()
 
         count = 0
+        skips = []
+        user_role = {'STUDENT', 'TEACHER'}
         for _, row in df.iterrows():
-            username = str(row['username']).strip()
-            cccd = str(row['cccd']).strip()
-            byte_password = cccd.encode('utf-8')
-            hash_password = bcrypt.hashpw(byte_password, bcrypt.gensalt(12))
-            password = hash_password.decode('utf-8')
-            user = User(
-                fullname=str(row['fullname']).strip(),
-                username=username,
-                email=str(row['email']).strip() if pd.notna(row['email']) else None,
-                password=password,
-                user_role=UserRole[str(row['user_role']).strip()]
+            if str(row['user_role']) not in user_role:
+                skips.append(count + 1)
+                continue
+
+            add_user(
+                fullname=str(row['fullname']),
+                username=str(row['username']),
+                email=str(row['email']),
+                password=str(row['cccd']),
+                user_role=str(row['user_role']),
             )
-            db.session.add(user)
             count += 1
 
-        db.session.commit()
-        flash(f"Thêm thành công {count} tài khoản", "success")
-
+        flash(f"Thêm thành công {count} tài khoản. Bỏ qua {len(skips)} tài khoản", "success")
+        for x in skips:
+            flash(f'Bỏ qua tài khoản thứ {x}', 'warning')
         return redirect(url_for('.index_view'))
 
     @expose('/import-csv', methods=['GET'])
     def import_csv_view(self):
         return self.render('admin/import_csv_view.html')
+
+    @staticmethod
+    def get_user_from_csv(file, user_role={'STUDENT', 'TEACHER'}):
+        try:
+            df = pd.read_csv(file)
+        except Exception as e:
+            raise ValueError(f'Cannot read csv file: {e}')
+        if df.empty:
+            raise ValueError('CSV file is empty')
+
+        df.columns = df.columns.str.strip()
+
+        missing_columns = {'fullname', 'username', 'email', 'cccd', 'user_role'} - set(df.columns)
+        if missing_columns:
+            raise ValueError(f'Missing columns: {missing_columns}')
+
+        users = []
+        for index, row in df.iterrows():
+            if row.isnull().any():
+                raise ValueError(f'Null data at row {index + 1}')
+
+            role = str(row['user_role']).strip()
+            if role not in user_role:
+                raise ValueError(f'Invalid role "{role}" at row {index + 1}')
+
+            users.append({
+                'fullname': str(row['fullname']).strip(),
+                'username': str(row['username']).strip(),
+                'email': str(row['email']).strip(),
+                'password': str(row['cccd']).strip(),
+                'user_role': role,
+            })
+
+        return users
 
 
 admin.add_view(RoomView(Room, db.session, name='Phòng'))

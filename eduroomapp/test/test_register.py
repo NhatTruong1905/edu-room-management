@@ -1,5 +1,4 @@
 import hashlib
-
 import bcrypt
 import pytest
 from sqlalchemy.exc import IntegrityError
