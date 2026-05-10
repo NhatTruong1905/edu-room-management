@@ -26,3 +26,4 @@ def permission(allow=None):
         return decorated_function
 
     return decorator
+

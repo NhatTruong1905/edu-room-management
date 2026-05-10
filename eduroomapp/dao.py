@@ -7,9 +7,11 @@ import bcrypt
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import and_
 from sqlalchemy.sql.functions import func
+import pandas as pd
 
 from eduroomapp import db, app
-from eduroomapp.models import User, UserRole, Room, RoomStatus, Booking, BookingStatus
+from eduroomapp.models import User, UserRole, Room, RoomStatus, Booking, BookingStatus, add_data
+from eduroomapp.exceptions import DeleteRoomException, EmptyRoomException
 
 
 def get_user_role():
@@ -44,20 +46,14 @@ def add_user(fullname, username, password, user_role, email):
     password = password.strip()
     email = email.strip()
 
-    if len(fullname) < 5:
-        raise ValueError("Fullname tối thiểu 5 ký tự")
-
     if len(username) < 4:
         raise ValueError("Username tối thiểu 4 ký tự")
 
+    if len(fullname) < 4:
+        raise ValueError("Fullname tối thiểu 4 ký tự")
+
     if len(password) < 3:
         raise ValueError("Password tối thiểu 3 ký tự")
-
-    if not re.search(r'[a-z]', username):
-        raise ValueError("Username phải có ký tự chữ")
-
-    if not re.search(r'[0-9]', username):
-        raise ValueError("Username phải có ký tự số")
 
     if not re.search(r'(@gmail\.com|@.*\.edu\.vn)$', email):
         raise ValueError("Email phải có đuôi @gmail.com hoặc định dạng @tên_trường.edu.vn")
@@ -271,3 +267,29 @@ def cancel_booking(booking_id, user_id):
 
 def get_booking_of_user(user_id, room_id):
     return db.session.query(Booking).filter(Booking.room_id == room_id, Booking.user_id == user_id).first()
+
+
+def delete_room(room_id, current_user):
+    if not current_user or current_user.user_role != UserRole.ADMIN:
+        raise PermissionError("Bạn không có quyền thực hiện thao tác này!")
+
+    room = Room.query.get(room_id)
+    if not room:
+        raise EmptyRoomException("Phòng không tồn tại!")
+
+    future_booking = Booking.query.filter(
+        Booking.room_id == room_id,
+        Booking.start_time > datetime.now(),
+        Booking.status == BookingStatus.CONFIRMED
+    ).first()
+
+    if future_booking:
+        raise DeleteRoomException(f"Phòng đang có lịch đặt trong tương lai, không thể xoá!")
+
+    try:
+        db.session.delete(room)
+        db.session.commit()
+        return True
+    except Exception as e:
+        db.session.rollback()
+        raise e

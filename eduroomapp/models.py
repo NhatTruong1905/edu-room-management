@@ -64,7 +64,7 @@ class Booking(BaseModel):
     updated_at = Column(DateTime, onupdate=func.now())
 
     user_id = Column(Integer, ForeignKey('user.id', ondelete='CASCADE'), nullable=False)
-    room_id = Column(Integer, ForeignKey('room.id', ondelete='RESTRICT'), nullable=False)
+    room_id = Column(Integer, ForeignKey('room.id', ondelete='SET NULL'), nullable=True)
 
     user = relationship('User', back_populates='bookings')
     room = relationship('Room', back_populates='bookings')

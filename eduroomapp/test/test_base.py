@@ -59,7 +59,6 @@ def sample_users(test_session):
     test_session.commit()
     return [u1, u2]
 
-
 @pytest.fixture
 def sample_bookings(test_session, sample_rooms, sample_users):
     r1, r2, r3, r4 = sample_rooms
@@ -103,6 +102,15 @@ def sample_bookings(test_session, sample_rooms, sample_users):
 
 
 @pytest.fixture
+def sample_admin(test_session):
+    admin = User(fullname="Nguyen Van Tuan", username="admin", password="123", email="admin@gmail.com",
+              user_role=UserRole.ADMIN)
+
+    test_session.add(admin)
+    test_session.commit()
+    return admin
+
+@pytest.fixture
 def auth_client(test_client, mocker):
     class FakeUser:
         def __init__(self):
@@ -119,3 +127,4 @@ def auth_client(test_client, mocker):
     fake_user = FakeUser()
     mocker.patch('flask_login.utils._get_user', return_value=fake_user)
     return test_client, fake_user
+
