@@ -67,7 +67,7 @@ def test_reset_search_form(driver):
     booking.open_page()
 
     booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=20)
-    time.sleep(1)
+    time.sleep(5)
     booking.reset_form()
     time.sleep(1)
 
@@ -88,11 +88,11 @@ def test_book_room(driver):
     booking.open_page()
     booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=20)
 
-    time.sleep(2)
+    time.sleep(5)
     before = booking.get_booking_table_text()
     btn = driver.find_element(By.CSS_SELECTOR, '#room-list-container > div:nth-child(4) > div > div > div.d-flex.justify-content-between.align-items-end > button')
     btn.click()
-    time.sleep(2)
+    time.sleep(5)
 
     after = booking.get_booking_table_text()
     assert before != after
@@ -106,19 +106,19 @@ def test_cancel_booking(driver):
     booking.search_room(date='2026-05-26', start='08:00', end='10:00', min_capacity=20)
     btn = driver.find_element(By.CSS_SELECTOR, '#room-list-container > div:nth-child(4) > div > div > div.d-flex.justify-content-between.align-items-end > button')
     btn.click()
-    time.sleep(2)
+    time.sleep(5)
     before = booking.get_booking_table_text()
     booking.cancel_first_booking()
 
-    time.sleep(1)
+    time.sleep(5)
     alert = driver.switch_to.alert
     assert 'Bạn có chắc chắn muốn hủy lịch đặt phòng này không?'.strip().lower() in alert.text.strip().lower()
     alert.accept()
-    time.sleep(1)
+    time.sleep(5)
     alert = driver.switch_to.alert
     assert 'Hủy phòng thành công'.strip().lower() in alert.text.strip().lower()
     alert.accept()
-    time.sleep(1)
+    time.sleep(5)
 
     after = booking.get_booking_table_text()
 
@@ -133,11 +133,11 @@ def test_cancel_booking_dismiss(driver):
     before = booking.get_booking_table_text()
     booking.cancel_first_booking()
 
-    time.sleep(1)
+    time.sleep(5)
     alert = driver.switch_to.alert
     assert 'hủy lịch đặt phòng' in alert.text.lower()
     alert.dismiss()
-    time.sleep(2)
+    time.sleep(5)
 
     after = booking.get_booking_table_text()
     assert before == after
