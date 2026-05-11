@@ -1,10 +1,8 @@
 import time
 from datetime import datetime
-from telnetlib import EC
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
 
 from eduroomapp.test.pages.BookingPage import BookingPage
 from eduroomapp.test.pages.LoginPage import LoginPage
@@ -44,7 +42,7 @@ def login(driver):
     time.sleep(2)
 
 
-@wait(1)
+# @wait(1)
 def test_search_room(driver):
     login(driver)
     booking = BookingPage(driver)
@@ -62,7 +60,7 @@ def test_search_room(driver):
     for small in smalls:
         assert min_capacity <= int(small.text[:-3].strip())
 
-@wait(1)
+# @wait(1)
 def test_reset_search_form(driver):
     login(driver)
     booking = BookingPage(driver)
@@ -99,12 +97,16 @@ def test_book_room(driver):
     after = booking.get_booking_table_text()
     assert before != after
 
-@wait(1)
+# @wait(1)
 def test_cancel_booking(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
 
+    booking.search_room(date='2026-05-26', start='08:00', end='10:00', min_capacity=20)
+    btn = driver.find_element(By.CSS_SELECTOR, '#room-list-container > div:nth-child(4) > div > div > div.d-flex.justify-content-between.align-items-end > button')
+    btn.click()
+    time.sleep(2)
     before = booking.get_booking_table_text()
     booking.cancel_first_booking()
 
@@ -122,7 +124,7 @@ def test_cancel_booking(driver):
 
     assert before != after
 
-@wait(1)
+# @wait(1)
 def test_cancel_booking_dismiss(driver):
     login(driver)
     booking = BookingPage(driver)
