@@ -42,10 +42,12 @@ def test_session(test_app):
 @pytest.fixture
 def driver():
     chrome_options = Options()
-    chrome_options.add_argument("--headless=new") # QUAN TRỌNG: Phải có dòng này
+
+    chrome_options.add_argument("--headless=new")
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--disable-dev-shm-usage")
-    driver = webdriver.Chrome()
+
+    driver = webdriver.Chrome(options=chrome_options)
 
     yield driver
 
