@@ -1,3 +1,4 @@
+import time
 from functools import wraps
 
 from flask_login import current_user
@@ -27,3 +28,12 @@ def permission(allow=None):
 
     return decorator
 
+def wait(seconds):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            f = func(*args, **kwargs)
+            time.sleep(seconds)
+            return f
+        return wrapper
+    return decorator

@@ -1,5 +1,8 @@
 from datetime import datetime
 import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+
 from eduroomapp import db, app as main_app
 from eduroomapp.models import RoomStatus, Room, Booking, BookingStatus, User, UserRole
 from eduroomapp.index import register_root
@@ -34,6 +37,14 @@ def test_client(test_app):
 def test_session(test_app):
     yield db.session
     db.session.rollback()
+
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome()
+
+    yield driver
+
+    driver.quit()
 
 
 @pytest.fixture
