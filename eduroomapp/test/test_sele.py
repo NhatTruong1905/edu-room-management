@@ -23,7 +23,7 @@ def test_login_logout_success(driver):
     login.open_page()
     login.login('admin1', '123')
 
-    time.sleep(2)
+    time.sleep(5)
 
     assert driver.current_url == 'http://localhost:5000/'
     e = driver.find_element(By.CSS_SELECTOR, 'body > nav > div > div > span')
@@ -31,7 +31,7 @@ def test_login_logout_success(driver):
 
     logout = driver.find_element(By.CSS_SELECTOR, 'body > nav > div > div > a')
     logout.click()
-    time.sleep(2)
+    time.sleep(5)
     assert driver.current_url == 'http://localhost:5000/login'
 
 def login(driver):
@@ -39,7 +39,7 @@ def login(driver):
     login.open_page()
     login.login('admin1', '123')
 
-    time.sleep(2)
+    time.sleep(5)
 
 
 # @wait(1)
@@ -51,7 +51,7 @@ def test_search_room(driver):
     min_capacity = 5
     booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=min_capacity)
 
-    time.sleep(2)
+    time.sleep(5)
     smalls = driver.find_elements(
         By.CSS_SELECTOR,
         '#room-list-container .d-flex.justify-content-between.align-items-end small'
