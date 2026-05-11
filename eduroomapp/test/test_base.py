@@ -2,6 +2,7 @@ from datetime import datetime
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
 from eduroomapp import db, app as main_app
 from eduroomapp.models import RoomStatus, Room, Booking, BookingStatus, User, UserRole
@@ -40,6 +41,10 @@ def test_session(test_app):
 
 @pytest.fixture
 def driver():
+    chrome_options = Options()
+    chrome_options.add_argument("--headless=new") # QUAN TRỌNG: Phải có dòng này
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
     driver = webdriver.Chrome()
 
     yield driver
