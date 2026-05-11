@@ -1,4 +1,3 @@
-# eduroomapp/test/pages/BookingPage.py
 import time
 
 from selenium.webdriver.common.by import By
