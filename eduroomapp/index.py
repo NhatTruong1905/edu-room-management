@@ -16,7 +16,7 @@ def register_root(app):
         return render_template('home.html')
 
     @app.route('/booking')
-    @permission(allow={"roles": [UserRole.ADMIN], "access": False})
+    @permission()
     def booking_dashboard():
         today = date.today()
         start_week = today - timedelta(days=today.weekday())
@@ -287,7 +287,7 @@ def register_root(app):
         return jsonify({"bookings": bookings_list}), 200
 
     @app.route('/api/bookings/<int:id>', methods=['POST'])
-    @permission(allow={"roles": [UserRole.STUDENT, UserRole.TEACHER], "access": True})
+    @permission(allow={"roles": [UserRole.STUDENT, UserRole.TEACHER, UserRole.ADMIN], "access": True})
     def api_cancel_booking(id):
         try:
             dao.cancel_booking(booking_id=id, user_id=current_user.id)
