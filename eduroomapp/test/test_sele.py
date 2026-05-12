@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from eduroomapp.test.pages.BookingPage import BookingPage
 from eduroomapp.test.pages.LoginPage import LoginPage
 from eduroomapp.test.test_base import driver
-from eduroomapp.utils import wait
+from eduroomapp.utils import sleep
 
 BASE_URL = 'http://localhost:5000'
 
@@ -45,13 +45,14 @@ def login(driver):
 
 
 
+@sleep(2)
 def test_search_room(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
 
     min_capacity = 5
-    booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=min_capacity)
+    booking.search_room(date='2026-05-25', start='14:00', end='16:00', min_capacity=min_capacity)
 
     time.sleep(2)
     smalls = driver.find_elements(
@@ -63,12 +64,13 @@ def test_search_room(driver):
         assert min_capacity <= int(small.text[:-3].strip())
 
 
+@sleep(2)
 def test_reset_search_form(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
 
-    booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=20)
+    booking.search_room(date='2026-06-20', start='14:00', end='16:00', min_capacity=20)
     time.sleep(1)
     booking.reset_form()
     time.sleep(1)
@@ -84,11 +86,12 @@ def test_reset_search_form(driver):
     assert date == datetime.today().strftime('%Y-%m-%d')
     assert capacity == '30'
 
+@sleep(2)
 def test_book_room(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
-    booking.search_room(date='2026-05-20', start='08:00', end='10:00', min_capacity=20)
+    booking.search_room(date='2026-07-20', start='14:00', end='16:00', min_capacity=20)
 
     time.sleep(2)
     before = booking.get_booking_table_text()
@@ -100,11 +103,12 @@ def test_book_room(driver):
     assert before != after
 
 
+@sleep(2)
 def test_cancel_booking(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
-    booking.search_room(date='2026-05-24', start='08:00', end='10:00', min_capacity=20)
+    booking.search_room(date='2026-08-24', start='14:00', end='16:00', min_capacity=20)
 
     time.sleep(2)
     booking.get_booking_table_text()
@@ -133,7 +137,7 @@ def test_cancel_booking_dismiss(driver):
     login(driver)
     booking = BookingPage(driver)
     booking.open_page()
-    booking.search_room(date='2026-05-26', start='08:00', end='10:00', min_capacity=20)
+    booking.search_room(date='2026-05-26', start='14:00', end='16:00', min_capacity=20)
 
     time.sleep(2)
     booking.get_booking_table_text()
