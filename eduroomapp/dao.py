@@ -241,28 +241,26 @@ def cancel_booking(booking_id, user_id):
         raise Exception("Không tìm thấy lịch đặt!")
 
     now = datetime.now()
-    time_diff = booking.start_time - now
-    if time_diff < timedelta(minutes=30):
+    if booking.start_time - now < timedelta(minutes=30):
         raise Exception("Không thể hủy vì chỉ còn chưa đầy 30 phút là đến giờ sử dụng!")
-
-    booking.status = BookingStatus.CANCELED
 
     start_week = now.date() - timedelta(days=now.date().weekday())
     end_week = start_week + timedelta(days=6)
     cancel_count = get_cancel_count_week(user_id, start_week, end_week)
 
-    if cancel_count > 5:
+    if cancel_count >= 5:
         user = db.session.query(User).get(user_id)
         user.locked_until = now + timedelta(hours=24)
+        db.session.commit()
+        raise Exception("Tài khoản của bạn đã bị khóa 24h vì vượt quá 5 lần hủy tuần này!")
+
+    booking.status = BookingStatus.CANCELED
 
     try:
         db.session.commit()
     except Exception as e:
         db.session.rollback()
         raise Exception(f"Lỗi hệ thống: {e}")
-
-    if cancel_count > 5:
-        raise Exception("Không được phép hủy thêm! Tài khoản của bạn bị khóa 24h vì vượt quá giới hạn hủy tuần này!")
 
 
 def get_booking_of_user(user_id, room_id):

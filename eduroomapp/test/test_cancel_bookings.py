@@ -92,11 +92,10 @@ def test_cancel_bookings_lock_account(test_session, sample_rooms, sample_users, 
     test_session.commit()
 
     mock_get = mocker.patch('eduroomapp.dao.get_cancel_count_week', return_value=6)
-    with pytest.raises(Exception,
-                       match='Không được phép hủy thêm! Tài khoản của bạn bị khóa 24h vì vượt quá giới hạn hủy tuần này!'):
+    with pytest.raises(Exception, match="Tài khoản của bạn đã bị khóa 24h vì vượt quá 5 lần hủy tuần này!"):
         dao.cancel_booking(b.id, u1.id)
+        assert b.status == BookingStatus.CANCELED
 
-    assert b.status == BookingStatus.CANCELED
     assert u1.locked_until is not None
     assert u1.locked_until > now
     mock_get.assert_called_once()
