@@ -28,7 +28,7 @@ def permission(allow=None):
 
     return decorator
 
-def wait(seconds):
+def sleep(seconds):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):

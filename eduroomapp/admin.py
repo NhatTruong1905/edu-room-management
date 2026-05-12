@@ -76,29 +76,16 @@ class UserView(AuthenticatedAdmin, BaseModelAdminView):
     @expose('/import-csv', methods=['POST'])
     def import_csv(self):
         file = request.files.get('file')
-        df = pd.read_csv(file)
-        df.columns = df.columns.str.strip()
-
-        count = 0
-        skips = []
         user_role = {'STUDENT', 'TEACHER'}
-        for _, row in df.iterrows():
-            if str(row['user_role']) not in user_role:
-                skips.append(count + 1)
-                continue
 
-            add_user(
-                fullname=str(row['fullname']),
-                username=str(row['username']),
-                email=str(row['email']),
-                password=str(row['cccd']),
-                user_role=str(row['user_role']),
-            )
-            count += 1
+        try:
+            users = UserView.get_user_from_csv(file, user_role)
+            for u in users:
+                add_user(**u)
+            flash(f'Thêm thành công tài khoản')
+        except Exception as e:
+            flash(str(e))
 
-        flash(f"Thêm thành công {count} tài khoản. Bỏ qua {len(skips)} tài khoản", "success")
-        for x in skips:
-            flash(f'Bỏ qua tài khoản thứ {x}', 'warning')
         return redirect(url_for('.index_view'))
 
     @expose('/import-csv', methods=['GET'])

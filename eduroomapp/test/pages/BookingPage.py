@@ -32,11 +32,10 @@ class BookingPage(BasePage):
     def open_page(self):
         self.open(self.URL)
 
-    def search_room(self, date, start, end, min_capacity):
+    def search_room(self, start, end, min_capacity, date=None):
         e = self.find(*self.DATE_INPUT)
 
         self.driver.execute_script("arguments[0].value = arguments[1]",e,date)
-
         self.find(*self.START_TIME).send_keys(start)
         self.find(*self.END_TIME).send_keys(end)
 
