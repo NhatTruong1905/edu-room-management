@@ -7,6 +7,7 @@ from flask import request, redirect, url_for, flash
 from flask_admin import expose
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user
+from wtforms.validators import DataRequired, NumberRange
 
 from eduroomapp.models import UserRole, Room, User, Booking, BookingStatus
 from eduroomapp import admin, db, dao
@@ -28,10 +29,18 @@ class BaseModelAdminView(ModelView):
 class RoomView(AuthenticatedAdmin, BaseModelAdminView):
     column_filters = ['id', 'name', 'capacity']
     column_searchable_list = ['name']
+
+    form_excluded_columns = ['bookings']
+
     column_labels = {
         'id': 'Mã phòng',
         'name': 'Tên phòng',
         'capacity': 'Sức chứa'
+    }
+
+    form_args = {
+        'capacity': {'validators': [DataRequired(), NumberRange(min=5, max=200, message='Sức chứa phải từ 5 đến 200.')]
+        }
     }
 
     def delete_model(self, model):
