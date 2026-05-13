@@ -193,15 +193,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const btnResetForm = document.getElementById('btn-reset-form');
         if (btnResetForm) {
             btnResetForm.addEventListener('click', function () {
-                // 1. Reset form
                 document.getElementById('search-form').reset();
 
-                // 2. Đưa ngày về hôm nay
                 const today = new Date().toISOString().split('T')[0];
                 dateInput.value = today;
-                updateStartTimeOptions(); // Cập nhật lại các giờ bị ẩn
+                updateStartTimeOptions();
 
-                // 3. Xóa kết quả tìm kiếm hiện tại (vì form đã trống, ko reload được)
                 document.getElementById('room-list-container').innerHTML = `
                 <div class="col-12 text-center py-5 text-muted">
                     <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
@@ -219,24 +216,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 const start = document.getElementById('start_time').value;
                 const end = document.getElementById('end_time').value;
 
-                // Nếu đã có đủ thông tin thời gian, ta sẽ tải lại danh sách
                 if (date && start && end) {
-                    // Thêm hiệu ứng xoay icon cho đẹp (giống nút reload booking)
                     const icon = this.querySelector('i');
                     if (icon) icon.classList.add('fa-spin');
-
-                    loadRooms(currentPage); // Tải lại trang hiện tại
-
+                    loadRooms(currentPage);
                     setTimeout(() => {
                         if (icon) icon.classList.remove('fa-spin');
                     }, 800);
                 } else {
-                    // Nếu chưa chọn giờ, thì thực hiện xóa trắng như cũ
                     document.getElementById('room-list-container').innerHTML = `
-            <div class="col-12 text-center py-5 text-muted">
-                <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
-                <p>Vui lòng chọn thời gian bên trái để tìm phòng.</p>
-            </div>`;
+                    <div class="col-12 text-center py-5 text-muted">
+                        <i class="fa-solid fa-calendar-day fs-1 mb-3 bg-light p-4 rounded-circle"></i>
+                        <p>Vui lòng chọn thời gian bên trái để tìm phòng.</p>
+                    </div>`;
                     const paginationContainer = document.getElementById('pagination-container');
                     if (paginationContainer) paginationContainer.innerHTML = '';
                 }
