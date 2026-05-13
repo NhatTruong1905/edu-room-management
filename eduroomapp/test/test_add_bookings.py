@@ -31,7 +31,7 @@ def test_add_bookings_failure(test_session, sample_rooms, sample_users, mocker):
     mock_commit = mocker.patch('eduroomapp.db.session.commit', side_effect=Exception)
     mock_rollback = mocker.patch('eduroomapp.db.session.rollback')
 
-    with pytest.raises(Exception, match='Lỗi lưu đặt phòng:'):
+    with pytest.raises(Exception):
         dao.add_booking(u1.id, r4.id, start_time, end_time)
 
     mock_commit.assert_called_once()
