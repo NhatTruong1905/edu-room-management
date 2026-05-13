@@ -2,7 +2,7 @@ import math
 from datetime import datetime, date, timedelta
 import os
 from flask import render_template, request, redirect, flash, jsonify, url_for
-from eduroomapp import app, dao, google, db, facebook
+from eduroomapp import app, dao, google, db, facebook, socketio
 from flask_login import login_user, logout_user, login_required, current_user
 from eduroomapp import login
 from eduroomapp.dao import add_user
@@ -254,6 +254,12 @@ def register_root(app):
                 end_time=end_dt
             )
 
+            socketio.emit('update_room_ui', {
+                'room_id': room_id,
+                'start_time': start_dt.strftime('%Y-%m-%d %H:%M'),
+                'status': 'BOOKED'
+            })
+
             flash('Đặt phòng thành công!', 'success')
         except Exception as ex:
             flash(f'Đặt phòng thất bại. Vui lòng thử lại! \n Lỗi: {str(ex)}', 'danger')
@@ -301,12 +307,7 @@ def load_user(id):
     return dao.get_user_by_id(id)
 
 
-# @app.route('/admin')
-# def admin_view():
-#     return render_template("admin.html")
-
-
 if __name__ == '__main__':
     register_root(app=app)
     port = int(os.environ.get('PORT', 5000))
-    app.run(host='localhost', port=5000, debug=True)
+    socketio.run(app, host='localhost', port=5000, debug=True, allow_unsafe_werkzeug=True)

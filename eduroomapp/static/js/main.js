@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', function () {
+        const socket = io();
+
+        socket.on('update_room_ui', function (data) {
+            const currentDate = document.getElementById('date').value;
+            const currentStart = document.getElementById('start_time').value;
+
+            if (data.start_time.includes(currentDate) && data.start_time.includes(currentStart)) {
+                const roomBtn = document.querySelector(`button[name="room_id"][value="${data.room_id}"]`);
+
+                if (roomBtn) {
+                    const card = roomBtn.closest('.card');
+                    card.className = 'card h-100 rounded-3 room-card-disabled shadow-none';
+
+                    const title = card.querySelector('.card-title');
+                    title.className = 'card-title text-secondary fw-bold mb-0';
+
+                    const badge = card.querySelector('.badge');
+                    badge.className = 'badge bg-warning text-dark rounded-pill px-2 py-1';
+                    badge.innerText = 'Kín lịch';
+
+                    roomBtn.disabled = true;
+                    roomBtn.className = "btn btn-secondary btn-sm px-2";
+                    roomBtn.innerText = "Đã có người đặt";
+                    roomBtn.type = "button";
+                }
+            }
+        });
+
         let currentPage = 1;
 
         const dateInput = document.getElementById('date');

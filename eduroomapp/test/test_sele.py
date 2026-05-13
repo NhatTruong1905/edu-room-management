@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from telnetlib import EC
+# from telnetlib import EC
 
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By

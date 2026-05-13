@@ -1,6 +1,7 @@
 import time
 from functools import wraps
 
+import socketio
 from flask_login import current_user
 from flask import redirect, abort
 
@@ -28,6 +29,7 @@ def permission(allow=None):
 
     return decorator
 
+
 def sleep(seconds):
     def decorator(func):
         @wraps(func)
@@ -35,5 +37,7 @@ def sleep(seconds):
             f = func(*args, **kwargs)
             time.sleep(seconds)
             return f
+
         return wrapper
+
     return decorator

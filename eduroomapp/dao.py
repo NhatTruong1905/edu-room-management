@@ -179,19 +179,34 @@ def get_rooms_by_date_and_time(start_time, end_time, capacity=None, page=1):
 
 
 def add_booking(user_id, room_id, start_time, end_time):
-    booking = Booking(
-        user_id=user_id,
-        room_id=room_id,
-        start_time=start_time,
-        end_time=end_time,
-        status=BookingStatus.CONFIRMED
-    )
-    db.session.add(booking)
     try:
+        room = db.session.query(Room).filter(Room.id == room_id).with_for_update().first()
+        if not room:
+            raise Exception("Phòng không tồn tại!")
+
+        is_booked = Booking.query.filter(
+            Booking.room_id == room_id,
+            Booking.status == BookingStatus.CONFIRMED,
+            Booking.start_time == start_time,
+            Booking.end_time == end_time
+        ).first()
+        if is_booked:
+            raise Exception("Rất tiếc! Khung giờ này vừa có người đặt thành công.")
+
+        new_booking = Booking(
+            user_id=user_id,
+            room_id=room_id,
+            start_time=start_time,
+            end_time=end_time,
+            status=BookingStatus.CONFIRMED
+        )
+        db.session.add(new_booking)
         db.session.commit()
-    except IntegrityError as e:
+        # return new_booking
+    except Exception as e:
         db.session.rollback()
-        raise Exception(f"Lỗi lưu đặt phòng: {e}")
+        print(f"Lỗi add_booking: {e}")
+        raise e
 
 
 def get_bookings_user(user_id):
