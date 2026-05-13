@@ -1,11 +1,11 @@
 import enum
 from datetime import datetime, timedelta
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, validates
 from sqlalchemy.sql.functions import func
 from flask_login import UserMixin
 
 from eduroomapp import db, app
-from sqlalchemy import Column, String, Integer, Boolean, Enum, DateTime, ForeignKey
+from sqlalchemy import Column, String, Integer, Boolean, Enum, DateTime, ForeignKey, CheckConstraint
 
 
 class BaseModel(db.Model):
@@ -22,12 +22,21 @@ class RoomStatus(enum.Enum):
 
 class Room(BaseModel):
     __tablename__ = 'room'
-    __table_args__ = {'extend_existing': True}
+    __table_args__ = (
+        CheckConstraint('capacity >= 5 AND capacity <= 200', name='check_room_capacity'),
+        {'extend_existing': True}
+    )
     name = Column(String(50), nullable=False, unique=True)
     capacity = Column(Integer, nullable=False)
     status = Column(Enum(RoomStatus), default=RoomStatus.AVAILABLE, nullable=False)
 
     bookings = relationship('Booking', back_populates='room')
+
+    @validates('capacity')
+    def validate_capacity(self, key, capacity):
+        if capacity < 5 or capacity > 200:
+            raise ValueError('Sức chứa phải từ 5 đến 200.')
+        return capacity
 
 
 class UserRole(enum.Enum):
@@ -103,7 +112,7 @@ def add_data():
     r6 = Room(name="E501", capacity=45, status=RoomStatus.AVAILABLE)
     r7 = Room(name="Lap 01", capacity=30, status=RoomStatus.AVAILABLE)
     r8 = Room(name="Lap 02", capacity=30, status=RoomStatus.MAINTENANCE)
-    r9 = Room(name="Hall A", capacity=500, status=RoomStatus.AVAILABLE)
+    r9 = Room(name="Hall A", capacity=50, status=RoomStatus.AVAILABLE)
     r10 = Room(name="Meeting Room 1", capacity=10, status=RoomStatus.AVAILABLE)
     r11 = Room(name="Library Quiet Room", capacity=15, status=RoomStatus.AVAILABLE)
     r12 = Room(name="Workshop B", capacity=60, status=RoomStatus.AVAILABLE)
