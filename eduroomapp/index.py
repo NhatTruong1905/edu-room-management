@@ -308,6 +308,9 @@ def load_user(id):
 
 
 if __name__ == '__main__':
+    import socket
+
     register_root(app=app)
+    target_host = socket.gethostbyname('localhost')
     port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='localhost', port=5000, debug=True, allow_unsafe_werkzeug=True)
+    socketio.run(app, host=target_host, port=port, debug=True, allow_unsafe_werkzeug=True)
