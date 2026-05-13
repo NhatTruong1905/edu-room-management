@@ -189,7 +189,7 @@ def add_booking(user_id, room_id, start_time, end_time):
     db.session.add(booking)
     try:
         db.session.commit()
-    except Exception as e:
+    except IntegrityError as e:
         db.session.rollback()
         raise Exception(f"Lỗi lưu đặt phòng: {e}")
 
